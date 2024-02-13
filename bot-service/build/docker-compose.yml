@@ -1,0 +1,54 @@
+version: "3.9"
+
+networks:
+  common:
+    external: true
+    name: common
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+    volumes:
+      - bot-service-pg-volume:/var/lib/postgresql/data
+    container_name: bot-service-postgres
+    networks:
+      - common
+    ports:
+      - "5432:5432"
+  pgbouncer:
+    image: bitnami/pgbouncer:1.21.0
+    environment:
+      POSTGRESQL_HOST: "bot-service-postgres"
+      POSTGRESQL_PORT: "5432"
+      POSTGRESQL_USERNAME: "postgres"
+      POSTGRESQL_PASSWORD: "postgres"
+      POSTGRESQL_DATABASE: "postgres"
+      PGBOUNCER_PORT: "6432"
+      PGBOUNCER_IGNORE_STARTUP_PARAMETERS: "extra_float_digits"
+    ports:
+      - "6432:6432"
+    networks:
+      - common
+    container_name: bot-service-pgbouncer
+  app:
+    build:
+      context: ./..
+      dockerfile: build/Dockerfile
+    environment:
+      LISTEN_ADDR: "0.0.0.0"
+      LISTEN_PORT: "9090"
+      BOT_SERVICE_LOCATION: "bot-service:8001"
+      DATABASE_URL: "postgres://postgres:postgres@bot-service-pgbouncer:6432/postgres"
+      ENV: "prod"
+    ports:
+      - "8000:9090"
+    networks:
+      - common
+    container_name: bot-service
+
+volumes:
+  bot-service-pg-volume:
