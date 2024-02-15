@@ -17,8 +17,6 @@ services:
     container_name: bot-service-postgres
     networks:
       - common
-    ports:
-      - "5432:5432"
   pgbouncer:
     image: bitnami/pgbouncer:1.21.0
     environment:
@@ -30,6 +28,7 @@ services:
       PGBOUNCER_PORT: "6432"
       PGBOUNCER_IGNORE_STARTUP_PARAMETERS: "extra_float_digits"
     ports:
+      - "5432:6432" # For migrations, tern on Windows ignores config port
       - "6432:6432"
     networks:
       - common

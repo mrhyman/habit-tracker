@@ -7,18 +7,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type UserRepository interface {
+type HabitRepository interface {
 	Create(ctx context.Context, order *UserModel) error
 	GetByID(ctx context.Context, id string) (*UserModel, error)
-	SetBirthday(ctx context.Context, id string, birthday time.Time) error
-	ActivateHabit(ctx context.Context, id string, habitId string) error
+	SetActive(ctx context.Context, id string) error
+	SetSchedule(ctx context.Context, id string, scheduleId string) error
 }
 
-func NewUserRepository(conn *pgxpool.Pool) *UserRepositoryImpl {
+func NewHabitRepository(conn *pgxpool.Pool) *UserRepositoryImpl {
 	return &UserRepositoryImpl{conn: conn}
 }
 
-type UserRepositoryImpl struct {
+type HabitRepositoryImpl struct {
 	conn *pgxpool.Pool
 }
 
