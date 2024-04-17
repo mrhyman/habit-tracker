@@ -5,11 +5,11 @@ import (
 )
 
 type UserModel struct {
-	Id       string `pg:"id" json:"id"`
-	Nickname string `pg:"nickname" json:"nickname"`
-	//CreatedAt     *time.Time `pg:"created_at" json:"created_at"`
-	//Birthday      *time.Time `pg:"birthday" json:"birthday"`
-	//ActiveHabitId string     `pg:"active_habit_id" json:"active_habit_id"`
+	Id            string     `pg:"id" json:"id"`
+	Nickname      string     `pg:"nickname" json:"nickname"`
+	CreatedAt     *time.Time `pg:"created_at" json:"createdAt"`
+	Birthday      *time.Time `pg:"birthday" json:"birthday"`
+	ActiveHabitId string     `pg:"active_habit_id" json:"activeHabitId"`
 }
 
 type HabitModel struct {

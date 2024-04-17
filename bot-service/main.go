@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"main/internal/db/repository"
@@ -12,10 +11,17 @@ import (
 )
 
 func main() {
+
+	ctx := context.Background()
+
+	conn, err := pgxpool.New(ctx, "postgres://postgres:postgres@localhost:6432/postgres?sslmode=disable")
+	if err != nil {
+		log.Fatal("unable to create connection pool:", err)
+	}
+
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Hello!")
 	})
-
 	http.HandleFunc("/create", func(w http.ResponseWriter, r *http.Request) {
 
 		var u repository.UserModel
@@ -25,22 +31,16 @@ func main() {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		log.Println(u)
 
-		config, err := pgxpool.ParseConfig('jdbc:postgresql://localhost:6432/postgres')
-		conn, err := pgx.Connect(context.Background())
+		repo := repository.NewUserRepository(conn)
+		err = repo.CreateAndGetId(ctx, &u)
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		//pgx + repo + client
-		repo := repository.NewUserRepository(config)
 
 		fmt.Fprintf(w, "Person: %+v", u)
-
-		//args[0] = user.Id
-		//args[1] = user.Nickname
-		//args[2] = user.CreatedAt
-		//args[3] = user.Birthday
-		//args[4] = user.ActiveHabitId
 	})
 
 	fmt.Println("Starting service at port 8080")
