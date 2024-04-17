@@ -24,8 +24,8 @@ type UserRepositoryImpl struct {
 
 func (r *UserRepositoryImpl) CreateAndGetId(ctx context.Context, user *UserModel) error {
 	query := `INSERT INTO users 
-    	(id, nickname, created_at, birthday, active_habit_id) VALUES ($1, $2, $3, $4, $5)
-    	ON CONFLICT (id) DO NOTHING`
+   	(id, nickname, created_at, birthday, active_habit_id) VALUES ($1, $2, $3, $4, $5)
+   	ON CONFLICT (id) DO NOTHING`
 	args := make([]interface{}, 5)
 	args[0] = user.Id
 	args[1] = user.Nickname
