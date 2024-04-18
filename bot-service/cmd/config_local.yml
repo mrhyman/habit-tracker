@@ -1,0 +1,7 @@
+app_name: "bot-service"
+env: "local"
+
+db:
+  connection: "postgres://postgres:postgres@localhost:6432/postgres?sslmode=disable"
+  db_name: "postgres"
+  user_name: "postgres"
