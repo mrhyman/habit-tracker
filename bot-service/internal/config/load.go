@@ -6,8 +6,11 @@ import (
 )
 
 func MustLoad() *Config {
-	viper.SetConfigFile("config/config_local.yml")
+	//TODO: path & config name -> env
+	viper.AddConfigPath("./config")
+	viper.SetConfigName("config_local.yml")
 	viper.SetConfigType("yaml")
+
 	if err := viper.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
