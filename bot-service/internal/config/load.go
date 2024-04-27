@@ -1,25 +1,49 @@
 package config
 
 import (
-	"fmt"
+	"flag"
 	"github.com/spf13/viper"
+	"log"
+	"os"
+)
+
+const (
+	configPathCLIArg  = "config-path"
+	configPathENV     = "CONFIG_PATH"
+	configPathDefault = "./config/local.yml"
 )
 
 func MustLoad() *Config {
-	//TODO: path & config name -> env
-	viper.AddConfigPath("./config")
-	viper.SetConfigName("config_local.yml")
-	viper.SetConfigType("yaml")
+	viper.SetConfigFile(getConfigPath())
 
 	if err := viper.ReadInConfig(); err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		log.Fatalf("Fatal error config file: %s \n", err)
 	}
 
 	config := &Config{}
 
 	if err := viper.Unmarshal(config); err != nil {
-		panic(fmt.Errorf("Fatal error decoding envs: %s \n", err))
+		log.Fatalf("Fatal error decoding envs: %s \n", err)
 	}
 
 	return config
+}
+
+func getConfigPath() string {
+
+	var res string
+
+	flag.StringVar(&res, configPathCLIArg, "", "path to config file")
+	flag.Parse()
+
+	if res == "" {
+		res = os.Getenv(configPathENV)
+	}
+
+	if res == "" {
+		log.Println("Config file not set, using default")
+		res = configPathDefault
+	}
+
+	return res
 }

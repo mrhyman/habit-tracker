@@ -1,7 +1,10 @@
 package config
 
+import "time"
+
 type Config struct {
-	AppName  string         `mapstructure:"app_name" validate:"required"`
-	Env      string         `mapstructure:"env" env-default:"local" validate:"required"`
-	Database DatabaseConfig `mapstructure:"db" validate:"required"`
+	AppName         string         `mapstructure:"app_name"`
+	Env             string         `mapstructure:"env" env-default:"local"`
+	Database        DatabaseConfig `mapstructure:"db"`
+	GracefulTimeout time.Duration  `mapstructure:"graceful_timeout"`
 }

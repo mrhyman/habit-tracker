@@ -1,13 +1,23 @@
-FROM golang:1.22 as build
+FROM golang:1.22-alpine3.19 as build
 
-WORKDIR /go/src/app
+ENV CGO_ENABLED 0
+ENV GOOS linux
+
+RUN apk update --no-cache \
+    && apk add --no-cache tzdata \
+    && apk add --no-cache make \
+    && apk add --no-cache curl
+
+WORKDIR /bot
 COPY . .
 
-RUN go mod download
+RUN make build
 
-RUN CGO_ENABLED=0 go build -o /go/bin/app ./cmd/main.go
+FROM scratch
 
-FROM gcr.io/distroless/static-debian11
+EXPOSE 8080
 
-COPY --from=build /go/bin/app /
-CMD ["/app"]
+COPY --from=build /bot/bin/bot-service /bin/bot-service
+COPY --from=build /bot/config /config
+
+ENTRYPOINT ["/bin/bot-service", "-config-path", "./config/prod.yml"]

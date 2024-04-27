@@ -38,13 +38,9 @@ services:
       context: ./..
       dockerfile: build/Dockerfile
     environment:
-      LISTEN_ADDR: "0.0.0.0"
-      LISTEN_PORT: "9090"
-      BOT_SERVICE_LOCATION: "bot-service:8001"
-      DATABASE_URL: "postgres://postgres:postgres@bot-service-pgbouncer:6432/postgres"
       ENV: "prod"
     ports:
-      - "8000:9090"
+      - "8080:8080"
     networks:
       - common
     container_name: bot-service

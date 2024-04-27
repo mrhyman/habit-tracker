@@ -2,14 +2,15 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository interface {
-	Create(ctx context.Context, order *UserModel) error
-	GetByID(ctx context.Context, id string) (*UserModel, error)
+	Create(ctx context.Context, order UserRecord) error
+	GetByID(ctx context.Context, id string) (*UserRecord, error)
 	SetBirthday(ctx context.Context, id string, birthday time.Time) error
 	ActivateHabit(ctx context.Context, id string, habitId string) error
 }
@@ -22,23 +23,24 @@ type UserRepositoryImpl struct {
 	conn *pgxpool.Pool
 }
 
-func (r *UserRepositoryImpl) CreateAndGetId(ctx context.Context, user *UserModel) error {
+func (r *UserRepositoryImpl) CreateAndGetId(ctx context.Context, user UserRecord) error {
 	query := `INSERT INTO users 
    	(id, nickname, created_at, birthday, active_habit_id) VALUES ($1, $2, $3, $4, $5)
    	ON CONFLICT (id) DO NOTHING`
 	args := make([]interface{}, 5)
 	args[0] = user.Id
-	args[1] = user.Nickname
+	args[1] = &user.Nickname
 	args[2] = user.CreatedAt
-	args[3] = user.Birthday
+	args[3] = &user.Birthday
 	args[4] = user.ActiveHabitId
 
-	_, err := r.conn.Exec(ctx, query, args...)
+	u, err := r.conn.Exec(ctx, query, args...)
+	fmt.Println(u)
 	return err
 }
 
-func (r *UserRepositoryImpl) GetByID(ctx context.Context, id string) (*UserModel, error) {
-	var user UserModel
+func (r *UserRepositoryImpl) GetByID(ctx context.Context, id string) (*UserRecord, error) {
+	var user UserRecord
 	sql := `SELECT * FROM users WHERE id = $1`
 	err := r.conn.QueryRow(ctx, sql, id).Scan(&user)
 	if err != nil {

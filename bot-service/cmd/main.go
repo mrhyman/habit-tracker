@@ -2,32 +2,29 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"github.com/ds248a/closer"
 	"log"
 	"main/internal/config"
 	"main/internal/database"
-	helloHandler "main/internal/handler/hello"
-	userHandler "main/internal/handler/user"
-
-	"net/http"
+	"main/internal/server"
+	"syscall"
 )
 
 func main() {
-	ctx := context.Background()
-	conf := config.MustLoad()
+	var (
+		ctx = context.Background()
+		cfg = config.MustLoad()
+	)
 
-	db, err := database.New(ctx, conf.Database.Connection)
-
+	db, err := database.New(ctx, cfg.Database)
 	if err != nil {
 		log.Fatal("unable to create connection pool:", err)
 	}
 
-	//TODO: router map - url: handler
-	http.Handle("/hello", helloHandler.NewHelloHandler())
-	http.Handle("/create", userHandler.NewCreateHandler(db, ctx))
+	s := server.New(ctx, db)
+	go s.Start()
 
-	fmt.Println("Starting service at port 8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
+	closer.Add(db.Close)
+	closer.Add(s.Shutdown)
+	closer.ListenSignal(syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
 }
