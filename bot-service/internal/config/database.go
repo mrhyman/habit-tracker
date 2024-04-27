@@ -1,9 +1,12 @@
 package config
 
+import "time"
+
 type DatabaseConfig struct {
-	Connection string `yaml:"connection" validate:"required" env:"DB_ENDPOINT"`
-	dbName     string `yaml:"db_name" validate:"required"`
-	userName   string `yaml:"user_name" validate:"required"`
+	Connection string        `mapstructure:"connection"`
+	DbName     string        `mapstructure:"dbName"`
+	UserName   string        `mapstructure:"user_name"`
+	Timeout    time.Duration `mapstructure:"timeout"`
 }
 
 func (dc DatabaseConfig) GetConnection() string {
@@ -11,17 +14,13 @@ func (dc DatabaseConfig) GetConnection() string {
 }
 
 func (dc DatabaseConfig) GetDbName() string {
-	return dc.dbName
-}
-
-func (dc DatabaseConfig) SetDbName(dbName string) {
-	dc.dbName = dbName
+	return dc.DbName
 }
 
 func (dc DatabaseConfig) GetUserName() string {
-	return dc.userName
+	return dc.UserName
 }
 
-func (dc DatabaseConfig) SetUserName(userName string) {
-	dc.userName = userName
+func (dc DatabaseConfig) GetTimeout() time.Duration {
+	return dc.Timeout
 }
