@@ -7,3 +7,6 @@ db:
   user_name: "postgres"
   timeout: 3s
 graceful_timeout: 10s
+bot:
+  token: 'LOCAL_TOKEN'
+  poller_timeout: 10s

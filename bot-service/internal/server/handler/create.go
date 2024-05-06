@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
+	"log"
 	"main/internal/database/repository"
 	"net/http"
 	"time"
@@ -37,6 +37,6 @@ func (h *HttpHandler) CreateUser() http.Handler {
 			return
 		}
 
-		fmt.Fprintf(w, "Person: %+v", u)
+		log.Printf("Person: %+v\n", u)
 	})
 }

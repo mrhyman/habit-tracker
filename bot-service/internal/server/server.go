@@ -2,10 +2,9 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"main/internal/database"
-	"main/internal/handler"
+	"main/internal/server/handler"
 	"net/http"
 )
 
@@ -33,7 +32,7 @@ func New(ctx context.Context, db *database.DB) *Server {
 }
 
 func (s *Server) Start() {
-	fmt.Println("Starting service at port 8080")
+	log.Printf("Starting service at port %s\n", s.Instance.Addr)
 	if err := s.Instance.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
