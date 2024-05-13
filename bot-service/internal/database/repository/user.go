@@ -2,14 +2,17 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"github.com/google/uuid"
+	"main/internal/domain"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository interface {
-	Create(ctx context.Context, order *UserModel) error
-	GetByID(ctx context.Context, id string) (*UserModel, error)
+	CreateUser(ctx context.Context, order UserRecord) error
+	GetUserByID(ctx context.Context, id string) (*UserRecord, error)
 	SetBirthday(ctx context.Context, id string, birthday time.Time) error
 	ActivateHabit(ctx context.Context, id string, habitId string) error
 }
@@ -22,7 +25,7 @@ type UserRepositoryImpl struct {
 	conn *pgxpool.Pool
 }
 
-func (r *UserRepositoryImpl) CreateAndGetId(ctx context.Context, user *UserModel) error {
+func (r *UserRepositoryImpl) CreateUser(ctx context.Context, user *domain.User) error {
 	query := `INSERT INTO users 
    	(id, nickname, created_at, birthday, active_habit_id) VALUES ($1, $2, $3, $4, $5)
    	ON CONFLICT (id) DO NOTHING`
@@ -33,12 +36,13 @@ func (r *UserRepositoryImpl) CreateAndGetId(ctx context.Context, user *UserModel
 	args[3] = user.Birthday
 	args[4] = user.ActiveHabitId
 
-	_, err := r.conn.Exec(ctx, query, args...)
+	u, err := r.conn.Exec(ctx, query, args...)
+	fmt.Println(u)
 	return err
 }
 
-func (r *UserRepositoryImpl) GetByID(ctx context.Context, id string) (*UserModel, error) {
-	var user UserModel
+func (r *UserRepositoryImpl) GetUserByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+	var user domain.User
 	sql := `SELECT * FROM users WHERE id = $1`
 	err := r.conn.QueryRow(ctx, sql, id).Scan(&user)
 	if err != nil {

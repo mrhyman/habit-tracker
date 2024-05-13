@@ -1,0 +1,9 @@
+app_name: "bot-service"
+env: "local"
+
+db:
+  connection: "postgres://postgres:postgres@localhost:6432/postgres"
+  dbName: "postgres"
+  user_name: "postgres"
+  timeout: 3s
+graceful_timeout: 10s
