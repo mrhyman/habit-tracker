@@ -6,7 +6,11 @@ import (
 	"log"
 	"main/internal/config"
 	"main/internal/database"
+	"main/internal/database/repository"
+	"main/internal/handler"
 	"main/internal/server"
+	"main/internal/usecase/createuser"
+	"main/internal/usecase/getuserbyid"
 	"syscall"
 )
 
@@ -19,7 +23,14 @@ func main() {
 		log.Fatal("unable to create connection pool:", err)
 	}
 
-	s := server.New(ctx, db)
+	userRepo := repository.NewUserRepository(db.Pool)
+
+	httpHandler := handler.New(
+		createuser.NewCommandHandler(userRepo),
+		getuserbyid.NewQueryHandler(userRepo),
+	)
+
+	s := server.New(cfg.Port, *httpHandler)
 	go s.Start()
 
 	closer.Add(db.Close)

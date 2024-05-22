@@ -1,27 +1,26 @@
 package createuser
 
 import (
-	"context"
 	"errors"
 	"main/internal/domain"
 )
 
-func (ch CommandHandler) Handle(ctx context.Context, cmd Command) error {
-	user, err := ch.userRepo.GetUserByID(ctx, cmd.User.Id)
+func (ch CommandHandler) Handle(cmd Command) error {
+	user, err := ch.userRepo.GetUserByID(cmd.UserId)
 	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return err
 	}
 
 	user, err = domain.NewUser(
-		cmd.User.Id,
-		cmd.User.Nickname,
-		cmd.User.Birthday,
-		cmd.User.ActiveHabitId,
+		cmd.UserId,
+		cmd.UserNickname,
+		cmd.UserBirthday,
+		cmd.UserActiveHabitId,
 	)
 	if err != nil {
 		return err
 	}
-	if err = ch.userRepo.CreateUser(ctx, user); err != nil {
+	if err = ch.userRepo.CreateUser(user); err != nil {
 		return err
 	}
 

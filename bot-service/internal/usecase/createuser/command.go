@@ -3,7 +3,7 @@ package createuser
 import (
 	"errors"
 	"github.com/google/uuid"
-	"main/internal/domain"
+	"time"
 )
 
 var (
@@ -12,19 +12,33 @@ var (
 )
 
 type Command struct {
-	User domain.User
+	UserId            uuid.UUID
+	UserNickname      string
+	UserCreatedAt     time.Time
+	UserBirthday      *time.Time
+	UserActiveHabitId *uuid.UUID
 }
 
-func NewCommand(user domain.User) (Command, error) {
-	if uuid.Nil == user.Id {
+func NewCommand(
+	id uuid.UUID,
+	nickname string,
+	createdAt time.Time,
+	birthday *time.Time,
+	activeHabitId *uuid.UUID,
+) (Command, error) {
+	if uuid.Nil == id {
 		return Command{}, ErrInvalidUserID
 	}
 
-	if user.Nickname == "" {
+	if nickname == "" {
 		return Command{}, ErrInvalidUserName
 	}
 
 	return Command{
-		User: user,
+		UserId:            id,
+		UserNickname:      nickname,
+		UserCreatedAt:     createdAt,
+		UserBirthday:      birthday,
+		UserActiveHabitId: activeHabitId,
 	}, nil
 }

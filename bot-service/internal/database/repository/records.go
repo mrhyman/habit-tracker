@@ -24,7 +24,7 @@ func (ur UserRecord) toUser() *domain.User {
 	}
 }
 
-func (ur UserRecord) userFromDomain(user *domain.User) UserRecord {
+func userFromDomain(user *domain.User) UserRecord {
 	return UserRecord{
 		Id:            user.Id,
 		Nickname:      user.Nickname,

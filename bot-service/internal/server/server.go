@@ -4,36 +4,26 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"main/internal/database"
-	"main/internal/database/repository"
 	"main/internal/handler"
-	"main/internal/usecase/createuser"
-	"main/internal/usecase/getuserbyid"
 	"net/http"
 )
 
 type Server struct {
-	Db       *database.DB
 	Instance *http.Server
 	Ctx      context.Context
 }
 
-func New(ctx context.Context, db *database.DB) *Server {
+func New(port int, httpHandler handler.HttpHandler) *Server {
 	mux := http.NewServeMux()
-	userRepo := repository.NewUserRepository(db.Pool)
 
-	httpHandler := handler.New(
-		ctx, createuser.NewCommandHandler(userRepo), getuserbyid.NewQueryHandler(userRepo),
-	)
 	mux.Handle("/hello", httpHandler.Hello())
-	mux.Handle("POST /create", httpHandler.CreateUser())
-	mux.Handle("GET /create", httpHandler.GetUserById())
+	mux.Handle("POST /createUser", httpHandler.CreateUser())
+	mux.Handle("GET /getUser", httpHandler.GetUserById())
 
 	return &Server{
-		Ctx: ctx,
-		Db:  db,
+		Ctx: context.Background(),
 		Instance: &http.Server{
-			Addr:    ":8080",
+			Addr:    fmt.Sprintf(":%d", port),
 			Handler: mux,
 		},
 	}

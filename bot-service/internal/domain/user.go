@@ -12,11 +12,11 @@ var (
 )
 
 type User struct {
-	Id            uuid.UUID  `json:"userId"`
-	Nickname      string     `json:"nickname"`
-	CreatedAt     time.Time  `json:"createdAt"`
-	Birthday      *time.Time `json:"birthday"`
-	ActiveHabitId *uuid.UUID `json:"activeHabitId,omitempty"`
+	Id            uuid.UUID
+	Nickname      string
+	CreatedAt     time.Time
+	Birthday      *time.Time
+	ActiveHabitId *uuid.UUID
 }
 
 func NewUser(

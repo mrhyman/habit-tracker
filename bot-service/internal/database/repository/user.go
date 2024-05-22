@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"main/internal/domain"
 	"time"
 
@@ -25,31 +26,41 @@ type UserRepositoryImpl struct {
 	conn *pgxpool.Pool
 }
 
-func (r *UserRepositoryImpl) CreateUser(ctx context.Context, user *domain.User) error {
-	query := `INSERT INTO users 
-   	(id, nickname, created_at, birthday, active_habit_id) VALUES ($1, $2, $3, $4, $5)
-   	ON CONFLICT (id) DO NOTHING`
-	args := make([]interface{}, 5)
-	args[0] = user.Id
-	args[1] = user.Nickname
-	args[2] = user.CreatedAt
-	args[3] = user.Birthday
-	args[4] = user.ActiveHabitId
+func (r *UserRepositoryImpl) CreateUser(user *domain.User) error {
+	record := userFromDomain(user)
+	query := `INSERT INTO users (id, nickname, created_at, birthday, active_habit_id) VALUES (@id, @nickname, @createdAt, @birthday, @activeHabitId) ON CONFLICT (id) DO NOTHING`
+	args := pgx.NamedArgs{
+		"id":            record.Id,
+		"nickname":      record.Nickname,
+		"createdAt":     record.CreatedAt,
+		"birthday":      record.Birthday,
+		"activeHabitId": record.ActiveHabitId,
+	}
 
-	u, err := r.conn.Exec(ctx, query, args...)
+	u, err := r.conn.Exec(context.Background(), query, args)
 	fmt.Println(u)
 	return err
 }
 
-func (r *UserRepositoryImpl) GetUserByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
-	var user domain.User
-	sql := `SELECT * FROM users WHERE id = $1`
-	err := r.conn.QueryRow(ctx, sql, id).Scan(&user)
+func (r *UserRepositoryImpl) GetUserByID(id uuid.UUID) (*domain.User, error) {
+	var record UserRecord
+	query := `SELECT * FROM users WHERE id = @id`
+	args := pgx.NamedArgs{
+		"id": id,
+	}
+	err := r.conn.QueryRow(context.Background(), query, args).Scan(
+		&record.Id,
+		&record.Nickname,
+		&record.CreatedAt,
+		&record.Birthday,
+		&record.ActiveHabitId,
+	)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return record.toUser(), nil
 }
 
 func (r *UserRepositoryImpl) SetBirthday(ctx context.Context, id string, b time.Time) error {

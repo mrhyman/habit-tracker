@@ -17,14 +17,14 @@ func (h *HttpHandler) GetUserById() http.Handler {
 			return
 		}
 
-		userUuid, err := uuid.FromBytes([]byte(userId))
+		userUuid, err := uuid.Parse(userId)
 		if err != nil {
 			http.Error(w, domain.ErrInvalidUserID.Error(), http.StatusBadRequest)
 		}
 
 		q, err := getuserbyid.NewQuery(userUuid)
 
-		u, err := h.GetUserByIdHandler.Handle(h.Ctx, q)
+		u, err := h.GetUserByIdHandler.Handle(q)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

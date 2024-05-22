@@ -3,14 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"main/internal/domain"
 	"main/internal/usecase/createuser"
 	"net/http"
 )
 
 func (h *HttpHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var u domain.User
+		var u UserModel
 
 		err := json.NewDecoder(r.Body).Decode(&u)
 		if err != nil {
@@ -18,14 +17,14 @@ func (h *HttpHandler) CreateUser() http.Handler {
 			return
 		}
 
-		cmd, err := createuser.NewCommand(u)
+		cmd, err := createuser.NewCommand(u.Id, u.Nickname, u.CreatedAt, u.Birthday, u.ActiveHabitId)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		err = h.CreateUserHandler.Handle(h.Ctx, cmd)
+		err = h.CreateUserHandler.Handle(cmd)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
