@@ -1,35 +1,48 @@
 package handler
 
 import (
-	"fmt"
-	"github.com/google/uuid"
+	"encoding/json"
+	"errors"
 	"main/internal/domain"
 	"main/internal/usecase/getuserbyid"
 	"net/http"
+)
+
+var (
+	ErrInvalidArgument = errors.New("invalid argument")
 )
 
 func (h *HttpHandler) GetUserById() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userId := r.URL.Query().Get("id")
 
-		if userId == "" {
-			http.Error(w, domain.ErrIdInvalid.Error(), http.StatusBadRequest)
+		q, err := getuserbyid.NewQuery(userId)
+		if err != nil {
+			http.Error(w, errors.Join(ErrInvalidArgument, err).Error(), http.StatusBadRequest)
 			return
 		}
 
-		userUuid, err := uuid.Parse(userId)
+		u, err := h.GetUserByIdHandler.Handle(q)
 		if err != nil {
-			http.Error(w, domain.ErrInvalidUserID.Error(), http.StatusBadRequest)
+			if errors.Is(err, domain.ErrUserNotFound) {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
-		q, err := getuserbyid.NewQuery(userUuid)
-
-		u, err := h.GetUserByIdHandler.Handle(q)
+		body, err := json.Marshal(u)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Fprintf(w, "Person: %+v", u)
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 }

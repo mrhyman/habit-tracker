@@ -18,7 +18,6 @@ func (h *HttpHandler) CreateUser() http.Handler {
 		}
 
 		cmd, err := createuser.NewCommand(u.Id, u.Nickname, u.CreatedAt, u.Birthday, u.ActiveHabitId)
-
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

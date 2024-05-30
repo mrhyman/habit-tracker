@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	ErrEmptyUserID   = errors.New("empty user id")
 	ErrInvalidUserID = errors.New("user ID should be a valid UUID")
 )
 
@@ -13,12 +14,20 @@ type Query struct {
 	UserID uuid.UUID
 }
 
-func NewQuery(userID uuid.UUID) (Query, error) {
-	if uuid.Nil == userID {
+func NewQuery(userId string) (Query, error) {
+	if userId == "" {
+		return Query{}, ErrEmptyUserID
+	}
+
+	userUuid, err := uuid.Parse(userId)
+	if err != nil {
+		return Query{}, ErrInvalidUserID
+	}
+	if uuid.Nil == userUuid {
 		return Query{}, ErrInvalidUserID
 	}
 
 	return Query{
-		UserID: userID,
+		UserID: userUuid,
 	}, nil
 }

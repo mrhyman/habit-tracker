@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"main/internal/domain"
@@ -37,8 +36,7 @@ func (r *UserRepositoryImpl) CreateUser(user *domain.User) error {
 		"activeHabitId": record.ActiveHabitId,
 	}
 
-	u, err := r.conn.Exec(context.Background(), query, args)
-	fmt.Println(u)
+	_, err := r.conn.Exec(context.Background(), query, args)
 	return err
 }
 
