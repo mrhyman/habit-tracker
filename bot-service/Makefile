@@ -42,3 +42,7 @@ clean:
 	rm -fr $(TMP)
 	rm -fr $(PWD)/vendor
 	rm -fr $(PROTO_OUT)
+
+.PHONY: generate
+generate:
+	go generate ./...

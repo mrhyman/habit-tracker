@@ -12,6 +12,7 @@ var (
 )
 
 type Command struct {
+	//uuid.UUID -> string? валидация внутри хендла команды
 	UserId            uuid.UUID
 	UserNickname      string
 	UserCreatedAt     time.Time

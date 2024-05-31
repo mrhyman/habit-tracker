@@ -1,3 +1,4 @@
+//go:generate minimock -g -s .go -o ../../../mocks/usecase/createUser
 package createuser
 
 import (

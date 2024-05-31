@@ -1,3 +1,4 @@
+//go:generate minimock -g -s .go -o ../../mocks/handler/http
 package handler
 
 import (
