@@ -23,9 +23,6 @@ func NewQuery(userId string) (Query, error) {
 	if err != nil {
 		return Query{}, ErrInvalidUserID
 	}
-	if uuid.Nil == userUuid {
-		return Query{}, ErrInvalidUserID
-	}
 
 	return Query{
 		UserID: userUuid,

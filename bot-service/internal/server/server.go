@@ -14,17 +14,11 @@ type Server struct {
 }
 
 func New(port int, httpHandler handler.HttpHandler) *Server {
-	mux := http.NewServeMux()
-
-	mux.Handle("/hello", httpHandler.Hello())
-	mux.Handle("POST /createUser", httpHandler.CreateUser())
-	mux.Handle("GET /getUser", httpHandler.GetUserById())
-
 	return &Server{
 		Ctx: context.Background(),
 		Instance: &http.Server{
 			Addr:    fmt.Sprintf(":%d", port),
-			Handler: mux,
+			Handler: httpHandler.SetupMux(),
 		},
 	}
 }

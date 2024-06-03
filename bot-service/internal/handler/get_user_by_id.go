@@ -32,7 +32,7 @@ func (h *HttpHandler) GetUserById() http.Handler {
 			return
 		}
 
-		body, err := json.Marshal(u)
+		body, err := json.Marshal(UserFromDomain(u))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

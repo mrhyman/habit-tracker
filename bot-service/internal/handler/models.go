@@ -7,16 +7,17 @@ import (
 )
 
 type UserModel struct {
-	Id            uuid.UUID  `json:"id"`
+	Id            string     `json:"id"`
 	Nickname      string     `json:"nickname"`
-	CreatedAt     time.Time  `json:"created_at"`
+	CreatedAt     time.Time  `json:"createdAt"`
 	Birthday      *time.Time `json:"birthday"`
 	ActiveHabitId *uuid.UUID `json:"active_habit_id,omitempty"`
 }
 
 func (um UserModel) toUser() *domain.User {
+	uuidId, _ := uuid.Parse(um.Id)
 	return &domain.User{
-		Id:            um.Id,
+		Id:            uuidId,
 		Nickname:      um.Nickname,
 		CreatedAt:     um.CreatedAt,
 		Birthday:      um.Birthday,
@@ -24,9 +25,9 @@ func (um UserModel) toUser() *domain.User {
 	}
 }
 
-func (um UserModel) userFromDomain(user *domain.User) UserModel {
+func UserFromDomain(user *domain.User) UserModel {
 	return UserModel{
-		Id:            user.Id,
+		Id:            user.Id.String(),
 		Nickname:      user.Nickname,
 		CreatedAt:     user.CreatedAt,
 		Birthday:      user.Birthday,

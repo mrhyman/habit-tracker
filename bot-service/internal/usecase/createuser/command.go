@@ -12,22 +12,24 @@ var (
 )
 
 type Command struct {
-	//uuid.UUID -> string? валидация внутри хендла команды
 	UserId            uuid.UUID
 	UserNickname      string
-	UserCreatedAt     time.Time
 	UserBirthday      *time.Time
 	UserActiveHabitId *uuid.UUID
 }
 
 func NewCommand(
-	id uuid.UUID,
+	id string,
 	nickname string,
-	createdAt time.Time,
 	birthday *time.Time,
 	activeHabitId *uuid.UUID,
 ) (Command, error) {
-	if uuid.Nil == id {
+	if id == "" {
+		return Command{}, ErrInvalidUserID
+	}
+
+	uuidId, err := uuid.Parse(id)
+	if err != nil {
 		return Command{}, ErrInvalidUserID
 	}
 
@@ -36,9 +38,8 @@ func NewCommand(
 	}
 
 	return Command{
-		UserId:            id,
+		UserId:            uuidId,
 		UserNickname:      nickname,
-		UserCreatedAt:     createdAt,
 		UserBirthday:      birthday,
 		UserActiveHabitId: activeHabitId,
 	}, nil

@@ -5,6 +5,7 @@ import (
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
+	"net/http"
 )
 
 type iCreateUser interface {
@@ -18,6 +19,14 @@ type iGetUser interface {
 type HttpHandler struct {
 	CreateUserHandler  iCreateUser
 	GetUserByIdHandler iGetUser
+}
+
+func (h *HttpHandler) SetupMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.Handle("/hello", h.Hello())
+	mux.Handle("POST /createUser", h.CreateUser())
+	mux.Handle("GET /getUser", h.GetUserById())
+	return mux
 }
 
 func New(

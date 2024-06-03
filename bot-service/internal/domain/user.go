@@ -30,10 +30,12 @@ func NewUser(
 		return nil, ErrInvalidUserName
 	}
 
+	now := timeNowFn()
+
 	user := &User{
 		Id:            userID,
 		Nickname:      userName,
-		CreatedAt:     time.Now().UTC(),
+		CreatedAt:     now,
 		Birthday:      birthday,
 		ActiveHabitId: activeHabitId,
 	}
