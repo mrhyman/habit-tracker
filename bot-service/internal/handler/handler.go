@@ -1,16 +1,40 @@
+//go:generate minimock -g -s .go -o ../../mocks/handler/http
 package handler
 
 import (
-	"context"
-	"main/internal/database"
-	"main/internal/database/repository"
+	"main/internal/domain"
+	"main/internal/usecase/createuser"
+	"main/internal/usecase/getuserbyid"
+	"net/http"
 )
 
-type HttpHandler struct {
-	Ctx            context.Context
-	UserRepository *repository.UserRepositoryImpl
+type iCreateUser interface {
+	Handle(cmd createuser.Command) error
 }
 
-func New(ctx context.Context, db *database.DB) *HttpHandler {
-	return &HttpHandler{ctx, repository.NewUserRepository(db.Pool)}
+type iGetUser interface {
+	Handle(q getuserbyid.Query) (*domain.User, error)
+}
+
+type HttpHandler struct {
+	CreateUserHandler  iCreateUser
+	GetUserByIdHandler iGetUser
+}
+
+func (h *HttpHandler) SetupMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.Handle("/hello", h.Hello())
+	mux.Handle("POST /createUser", h.CreateUser())
+	mux.Handle("GET /getUser", h.GetUserById())
+	return mux
+}
+
+func New(
+	createUserHandler iCreateUser,
+	getUserByIdHandler iGetUser,
+) *HttpHandler {
+	return &HttpHandler{
+		CreateUserHandler:  createUserHandler,
+		GetUserByIdHandler: getUserByIdHandler,
+	}
 }

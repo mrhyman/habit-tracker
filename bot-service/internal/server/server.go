@@ -4,30 +4,21 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"main/internal/database"
 	"main/internal/handler"
 	"net/http"
 )
 
 type Server struct {
-	Db       *database.DB
 	Instance *http.Server
 	Ctx      context.Context
 }
 
-func New(ctx context.Context, db *database.DB) *Server {
-	mux := http.NewServeMux()
-
-	httpHandler := handler.New(ctx, db)
-	mux.Handle("/hello", httpHandler.Hello())
-	mux.Handle("/create", httpHandler.CreateUser())
-
+func New(port int, httpHandler handler.HttpHandler) *Server {
 	return &Server{
-		Ctx: ctx,
-		Db:  db,
+		Ctx: context.Background(),
 		Instance: &http.Server{
-			Addr:    ":8080",
-			Handler: mux,
+			Addr:    fmt.Sprintf(":%d", port),
+			Handler: httpHandler.SetupMux(),
 		},
 	}
 }

@@ -1,5 +1,6 @@
 app_name: "bot-service"
 env: "local"
+port: 8080
 
 db:
   connection: "postgres://postgres:postgres@localhost:6432/postgres"

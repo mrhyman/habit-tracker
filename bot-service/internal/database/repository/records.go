@@ -2,19 +2,20 @@ package repository
 
 import (
 	"github.com/google/uuid"
+	"main/internal/domain"
 	"time"
 )
 
 type UserRecord struct {
-	Id            uuid.UUID  `pg:"id"`
-	Nickname      string     `pg:"nickname"`
-	CreatedAt     time.Time  `pg:"created_at"`
-	Birthday      *time.Time `pg:"birthday"`
-	ActiveHabitId *uuid.UUID `pg:"active_habit_id,omitempty"`
+	Id            uuid.UUID  `db:"id"`
+	Nickname      string     `db:"nickname"`
+	CreatedAt     time.Time  `db:"created_at"`
+	Birthday      *time.Time `db:"birthday"`
+	ActiveHabitId *uuid.UUID `db:"active_habit_id,omitempty"`
 }
 
-func (ur UserRecord) ToDTO() UserDTO {
-	return UserDTO{
+func (ur UserRecord) toUser() *domain.User {
+	return &domain.User{
 		Id:            ur.Id,
 		Nickname:      ur.Nickname,
 		CreatedAt:     ur.CreatedAt,
@@ -23,12 +24,12 @@ func (ur UserRecord) ToDTO() UserDTO {
 	}
 }
 
-func (ur UserRecord) FromDTO(dto UserDTO) UserRecord {
+func userFromDomain(user *domain.User) UserRecord {
 	return UserRecord{
-		Id:            dto.Id,
-		Nickname:      dto.Nickname,
-		CreatedAt:     dto.CreatedAt,
-		Birthday:      dto.Birthday,
-		ActiveHabitId: dto.ActiveHabitId,
+		Id:            user.Id,
+		Nickname:      user.Nickname,
+		CreatedAt:     user.CreatedAt,
+		Birthday:      user.Birthday,
+		ActiveHabitId: user.ActiveHabitId,
 	}
 }

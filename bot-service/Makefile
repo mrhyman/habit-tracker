@@ -24,11 +24,11 @@ run:
 
 .PHONY: up
 up:
-	docker compose -f build/docker-compose.yml --project-name bot up -d --build
+	docker compose -f docker-compose.yml --project-name bot up -d --build
 
 .PHONY: down
 down:
-	docker compose -f build/docker-compose.yml --project-name bot stop
+	docker compose -f docker-compose.yml --project-name bot stop
 
 .PHONY: restart
 restart:
@@ -42,3 +42,11 @@ clean:
 	rm -fr $(TMP)
 	rm -fr $(PWD)/vendor
 	rm -fr $(PROTO_OUT)
+
+.PHONY: generate
+generate:
+	go generate ./...
+
+.PHONY: test
+test:
+	go test -cover ./...

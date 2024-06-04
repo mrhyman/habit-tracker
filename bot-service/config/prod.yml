@@ -1,5 +1,6 @@
 app_name: "bot-service"
 env: "prod"
+port: 9090
 
 db:
   connection: "postgres://postgres:postgres@bot-service-pgbouncer:6432/postgres"

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-                                      id uuid PRIMARY KEY UNIQUE,
+                                      id uuid PRIMARY KEY,
                                       nickname text NOT NULL,
                                       created_at timestamp NOT NULL,
                                       birthday timestamp,
