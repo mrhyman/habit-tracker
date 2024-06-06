@@ -47,12 +47,12 @@ func TestUC_Handle(t *testing.T) {
 		wantErr  string
 	}{
 		{
-			name: "sucsess",
+			name: "success",
 			args: args{
 				cmd: cmd,
 			},
 			setMocks: func(m mocks) {
-				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(&validUser, nil)
+				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(nil, domain.ErrUserNotFound)
 				m.userRepoMock.CreateUserMock.Set(func(user *domain.User) (err error) {
 					require.Equal(t, validUser.Id, user.Id)
 					return nil
@@ -61,28 +61,28 @@ func TestUC_Handle(t *testing.T) {
 			wantErr: "",
 		},
 		{
-			name: "user search error",
-			args: args{
-				cmd: cmd,
-			},
-			setMocks: func(m mocks) {
-				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(nil, someError)
-			},
-			wantErr: someError.Error(),
-		},
-		{
 			name: "user create error",
 			args: args{
 				cmd: cmd,
 			},
 			setMocks: func(m mocks) {
-				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(&validUser, nil)
+				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(nil, domain.ErrUserNotFound)
 				m.userRepoMock.CreateUserMock.Set(func(user *domain.User) (err error) {
 					require.Equal(t, validUser.Id, user.Id)
 					return someError
 				})
 			},
 			wantErr: someError.Error(),
+		},
+		{
+			name: "user already exists error",
+			args: args{
+				cmd: cmd,
+			},
+			setMocks: func(m mocks) {
+				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(&validUser, nil)
+			},
+			wantErr: domain.ErrUserAlreadyExists.Error(),
 		},
 	}
 

@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"main/internal/domain"
 	"time"
 
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -46,15 +48,12 @@ func (r *UserRepositoryImpl) GetUserByID(id uuid.UUID) (*domain.User, error) {
 	args := pgx.NamedArgs{
 		"id": id,
 	}
-	err := r.conn.QueryRow(context.Background(), query, args).Scan(
-		&record.Id,
-		&record.Nickname,
-		&record.CreatedAt,
-		&record.Birthday,
-		&record.ActiveHabitId,
-	)
+	err := pgxscan.Get(context.Background(), r.conn, &record, query, args)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrUserNotFound
+		}
 		return nil, err
 	}
 

@@ -11,6 +11,7 @@ import (
 	"main/internal/server"
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
+	"main/metrics"
 	"syscall"
 )
 
@@ -29,6 +30,8 @@ func main() {
 		createuser.NewCommandHandler(userRepo),
 		getuserbyid.NewQueryHandler(userRepo),
 	)
+
+	go metrics.RecordMetrics(userRepo, cfg.BusinessMetricsScrapeInterval)
 
 	s := server.New(cfg.Port, *httpHandler)
 	go s.Start()

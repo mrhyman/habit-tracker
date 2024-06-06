@@ -29,6 +29,10 @@ func (h *HttpHandler) CreateUser() http.Handler {
 			return
 		}
 
-		fmt.Fprintf(w, "Person: %+v", u)
+		if u.toUser().IsAdult() {
+			AdultUserInc.Inc()
+		}
+
+		fmt.Fprintf(w, "Person ID: %s", u.Id)
 	})
 }

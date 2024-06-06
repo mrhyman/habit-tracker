@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	ErrInvalidUserID   = errors.New("user ID should be a valid UUID")
-	ErrInvalidUserName = errors.New("user name should not be empty")
+	ErrInvalidUserID     = errors.New("user ID should be a valid UUID")
+	ErrInvalidUserName   = errors.New("user name should not be empty")
+	ErrUserAlreadyExists = errors.New("user with such id already exists")
 )
 
 type User struct {
@@ -30,7 +31,7 @@ func NewUser(
 		return nil, ErrInvalidUserName
 	}
 
-	now := timeNowFn()
+	now := timeNowFn().Truncate(time.Microsecond)
 
 	user := &User{
 		Id:            userID,
@@ -41,4 +42,11 @@ func NewUser(
 	}
 
 	return user, nil
+}
+
+func (u *User) IsAdult() bool {
+	if u.Birthday != nil {
+		return time.Since(*u.Birthday).Hours()/24/365 >= 18
+	}
+	return false
 }

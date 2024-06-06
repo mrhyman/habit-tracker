@@ -10,6 +10,9 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return err
 	}
+	if user != nil {
+		return domain.ErrUserAlreadyExists
+	}
 
 	user, err = domain.NewUser(
 		cmd.UserId,
