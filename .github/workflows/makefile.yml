@@ -7,21 +7,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  test-bs:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: configure
-      run: ./configure
-
-    - name: Install dependencies
-      run: make
-
-    - name: Run check
-      run: make check
-
-    - name: Run distcheck
-      run: make distcheck
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Run tests
+        working-directory: ./bot-service
+        run: make test

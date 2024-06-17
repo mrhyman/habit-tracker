@@ -2,6 +2,7 @@
 package handler
 
 import (
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
@@ -24,8 +25,10 @@ type HttpHandler struct {
 func (h *HttpHandler) SetupMux() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.Handle("/hello", h.Hello())
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("POST /createUser", h.CreateUser())
 	mux.Handle("GET /getUser", h.GetUserById())
+
 	return mux
 }
 

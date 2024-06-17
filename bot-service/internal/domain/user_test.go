@@ -10,7 +10,7 @@ import (
 
 var (
 	onceTimeNowFn sync.Once
-	testNowUtc    = time.Now().UTC()
+	testNowUtc    = time.Now().Truncate(time.Microsecond).UTC()
 )
 
 func setup() {

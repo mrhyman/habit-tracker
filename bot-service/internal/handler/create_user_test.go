@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
+	"main/internal/usecase/getuserbyid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -46,9 +47,10 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 			},
 			setMocks: func(m mocks) {
 				m.createUserMock.HandleMock.When(cmd).Then(nil)
+
 			},
 			wantCode: http.StatusOK,
-			wantBody: fmt.Sprintf("Person: %+v", validUser),
+			wantBody: fmt.Sprintf("Person ID: %s", validUser.Id),
 		},
 		{
 			name: "400 user decode error",
@@ -74,7 +76,7 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 			},
 			setMocks: func(m mocks) {},
 			wantCode: http.StatusBadRequest,
-			wantBody: fmt.Sprintf("%s\n", createuser.ErrInvalidUserID.Error()),
+			wantBody: fmt.Sprintf("%s\n", getuserbyid.ErrInvalidUserID.Error()),
 		},
 		{
 			name: "500 command handle error",

@@ -26,6 +26,10 @@ run:
 up:
 	docker compose -f docker-compose.yml --project-name bot up -d --build
 
+.PHONY: infra
+infra:
+	docker compose -f docker-compose.yml --project-name bot up -d postgres pgbouncer --build
+
 .PHONY: down
 down:
 	docker compose -f docker-compose.yml --project-name bot stop
@@ -49,4 +53,4 @@ generate:
 
 .PHONY: test
 test:
-	go test -cover ./...
+	go test -cover -v ./...

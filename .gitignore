@@ -21,4 +21,4 @@ bin/
 go.work
 
 .idea
-config/
+/bot-service/config/*
