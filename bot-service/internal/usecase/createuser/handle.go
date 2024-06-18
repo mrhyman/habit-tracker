@@ -2,6 +2,7 @@ package createuser
 
 import (
 	"errors"
+	"log/slog"
 	"main/internal/domain"
 )
 
@@ -11,6 +12,8 @@ func (ch CommandHandler) Handle(cmd Command) error {
 		return err
 	}
 	if user != nil {
+		slog.Warn("Closing database connection pool")
+
 		return domain.ErrUserAlreadyExists
 	}
 

@@ -1,9 +1,8 @@
 package main
 
 import (
-	"context"
 	"github.com/ds248a/closer"
-	"log"
+	"log/slog"
 	"main/internal/config"
 	"main/internal/database"
 	"main/internal/database/repository"
@@ -12,16 +11,18 @@ import (
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
 	"main/metrics"
+	"os"
 	"syscall"
 )
 
 func main() {
-	ctx := context.Background()
 	cfg := config.MustLoad()
+	config.InitLogger(cfg.Logger)
 
-	db, err := database.New(ctx, cfg.Database)
+	db, err := database.New(cfg.Database)
 	if err != nil {
-		log.Fatal("unable to create connection pool:", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
 	userRepo := repository.NewUserRepository(db.Pool)

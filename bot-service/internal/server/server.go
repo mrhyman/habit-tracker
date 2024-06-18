@@ -3,9 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"main/internal/handler"
 	"net/http"
+	"os"
 )
 
 type Server struct {
@@ -24,15 +25,17 @@ func New(port int, httpHandler handler.HttpHandler) *Server {
 }
 
 func (s *Server) Start() {
-	fmt.Println("Starting service at port 8080")
+	slog.Info(fmt.Sprintf("Listening on port%s", s.Instance.Addr))
 	if err := s.Instance.ListenAndServe(); err != nil {
-		log.Fatal(err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 }
 
 func (s *Server) Shutdown() {
-	log.Println("Shutting service down")
+	slog.Info("Shutting service down")
 	if err := s.Instance.Shutdown(s.Ctx); err != nil {
-		log.Fatal(err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 }

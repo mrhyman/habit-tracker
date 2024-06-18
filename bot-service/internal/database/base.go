@@ -6,7 +6,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"log"
+	"log/slog"
 	"main/internal/config"
 	"os"
 	"path/filepath"
@@ -31,22 +31,26 @@ func StartDbContainer(fixtureName string) (*postgres.PostgresContainer, *DB) {
 	)
 
 	if err != nil {
-		log.Fatalf("Failed to start PostgreSQL container: %s", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
 	dbConn, err := pgc.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		log.Fatalf("Failed to get connection string: %s", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
-	db, err := New(ctx, config.DatabaseConfig{Connection: dbConn})
+	db, err := New(config.DatabaseConfig{Connection: dbConn})
 	if err != nil {
-		log.Fatalf("unable to create connection pool: %s", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
 	err = WaitForPostgres(db)
 	if err != nil {
-		log.Fatalf("PostgreSQL is not ready: %s", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
 	return pgc, db

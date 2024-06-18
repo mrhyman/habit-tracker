@@ -2,8 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func (h *HttpHandler) Hello() http.Handler {
@@ -11,7 +12,8 @@ func (h *HttpHandler) Hello() http.Handler {
 		fmt.Println("Hello!")
 		_, err := w.Write([]byte("My hello page!"))
 		if err != nil {
-			log.Fatal("write failed:", err)
+			slog.Error(err.Error())
+			os.Exit(1)
 		}
 	})
 }

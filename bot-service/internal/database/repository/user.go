@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"log/slog"
 	"main/internal/domain"
 	"time"
 
@@ -37,6 +39,7 @@ func (r *UserRepositoryImpl) CreateUser(user *domain.User) error {
 		"birthday":      record.Birthday,
 		"activeHabitId": record.ActiveHabitId,
 	}
+	slog.Debug("create user DB record", "query_params", record)
 
 	_, err := r.conn.Exec(context.Background(), query, args)
 	return err
@@ -49,6 +52,7 @@ func (r *UserRepositoryImpl) GetUserByID(id uuid.UUID) (*domain.User, error) {
 		"id": id,
 	}
 	err := pgxscan.Get(context.Background(), r.conn, &record, query, args)
+	slog.Debug("get user DB record", "query_params", id)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -62,12 +66,14 @@ func (r *UserRepositoryImpl) GetUserByID(id uuid.UUID) (*domain.User, error) {
 
 func (r *UserRepositoryImpl) SetBirthday(ctx context.Context, id string, b time.Time) error {
 	query := `UPDATE users SET birthday = $1 WHERE id = $2`
+	slog.Debug("update user DB record birthday", "query_params", fmt.Sprintf("id: %s, birthday: %s", id, b))
 	_, err := r.conn.Exec(ctx, query, b, id)
 	return err
 }
 
 func (r *UserRepositoryImpl) ActivateHabit(ctx context.Context, id string, h string) error {
 	query := `UPDATE users SET active_habit_id = $1 WHERE id = $2`
+	slog.Debug("update user DB record habit", "query_params", fmt.Sprintf("id: %s, habit: %s", id, h))
 	_, err := r.conn.Exec(ctx, query, h, id)
 	return err
 }
