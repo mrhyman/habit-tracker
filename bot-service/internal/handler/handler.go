@@ -10,6 +10,7 @@ import (
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
 	"net/http"
+	"time"
 )
 
 type iCreateUser interface {
@@ -25,16 +26,15 @@ type HttpHandler struct {
 	GetUserByIdHandler iGetUser
 }
 
-func (h *HttpHandler) SetupMux() *http.ServeMux {
+func (h *HttpHandler) SetupMux() http.Handler {
 	mux := http.NewServeMux()
 
-	//роутер прицепить
-	mux.Handle("/hello", loggingMiddleware(h.Hello()))
+	mux.Handle("/hello", h.Hello())
 	mux.Handle("/metrics", promhttp.Handler())
-	mux.Handle("POST /createUser", loggingMiddleware(h.CreateUser()))
-	mux.Handle("GET /getUser", loggingMiddleware(h.GetUserById()))
+	mux.Handle("POST /createUser", h.CreateUser())
+	mux.Handle("GET /getUser", h.GetUserById())
 
-	return mux
+	return loggingMiddleware(mux)
 }
 
 func New(
@@ -47,7 +47,7 @@ func New(
 	}
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
+func loggingMiddleware(next *http.ServeMux) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var bodyBytes []byte
 		if r.Body != nil {
@@ -56,12 +56,14 @@ func loggingMiddleware(next http.Handler) http.Handler {
 
 		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
+		start := time.Now()
+
+		next.ServeHTTP(w, r)
 		slog.Info("request received",
 			"method", r.Method,
 			"url", r.URL.String(),
 			"body", string(bodyBytes),
+			"time_taken_ms", time.Since(start).Milliseconds(),
 		)
-
-		next.ServeHTTP(w, r)
 	})
 }
