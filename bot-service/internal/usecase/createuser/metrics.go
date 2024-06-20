@@ -1,4 +1,4 @@
-package handler
+package createuser
 
 import "github.com/prometheus/client_golang/prometheus"
 import "main/metrics"

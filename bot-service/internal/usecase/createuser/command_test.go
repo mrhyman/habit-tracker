@@ -36,7 +36,7 @@ func TestNewCommand(t *testing.T) {
 				birthday:      &timestamp,
 				activeHabitId: &userId,
 			},
-			want:    Command{userId, nickname, &timestamp, &userId},
+			want:    Command{userId, nickname, time.Time{}, &timestamp, &userId},
 			wantErr: "",
 		},
 		{
@@ -47,7 +47,7 @@ func TestNewCommand(t *testing.T) {
 				birthday:      nil,
 				activeHabitId: nil,
 			},
-			want:    Command{userId, nickname, nil, nil},
+			want:    Command{userId, nickname, time.Time{}, nil, nil},
 			wantErr: "",
 		},
 		{

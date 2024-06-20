@@ -5,27 +5,30 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log/slog"
 	"main/internal/config"
-	"os"
 )
 
 type DB struct {
+	ctx context.Context
 	*pgxpool.Pool
 }
 
-func New(config config.DatabaseConfig) (*DB, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), config.GetTimeout())
+func New(ctx context.Context, config config.DatabaseConfig) (*DB, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.GetTimeout())
 	defer cancel()
 
 	db, err := pgxpool.New(ctx, config.GetConnection())
 	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
+		return nil, err
 	}
 
-	return &DB{db}, nil
+	if err = db.Ping(ctx); err != nil {
+		return nil, err
+	}
+
+	return &DB{ctx, db}, nil
 }
 
 func (db *DB) Close() {
-	slog.Info("Closing database connection pool")
+	slog.InfoContext(db.ctx, "Closing database connection pool")
 	db.Pool.Close()
 }

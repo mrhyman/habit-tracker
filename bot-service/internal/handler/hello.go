@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
 )
 
 func (h *HttpHandler) Hello() http.Handler {
@@ -12,8 +11,8 @@ func (h *HttpHandler) Hello() http.Handler {
 		fmt.Println("Hello!")
 		_, err := w.Write([]byte("My hello page!"))
 		if err != nil {
-			slog.Error(err.Error())
-			os.Exit(1)
+			slog.ErrorContext(r.Context(), "hello-handler write error", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 }

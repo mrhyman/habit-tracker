@@ -21,8 +21,9 @@ type User struct {
 }
 
 func NewUser(
-	userID uuid.UUID, userName string, birthday *time.Time, activeHabitId *uuid.UUID,
+	userID uuid.UUID, userName string, createdAt time.Time, birthday *time.Time, activeHabitId *uuid.UUID,
 ) (*User, error) {
+	created := createdAt.UTC()
 	if uuid.Nil == userID {
 		return nil, ErrInvalidUserID
 	}
@@ -31,12 +32,14 @@ func NewUser(
 		return nil, ErrInvalidUserName
 	}
 
-	now := timeNowFn().Truncate(time.Microsecond)
+	if time.Time.IsZero(created) {
+		created = timeNowFn()
+	}
 
 	user := &User{
 		Id:            userID,
 		Nickname:      userName,
-		CreatedAt:     now,
+		CreatedAt:     created.Truncate(time.Microsecond),
 		Birthday:      birthday,
 		ActiveHabitId: activeHabitId,
 	}

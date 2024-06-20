@@ -14,17 +14,6 @@ type UserModel struct {
 	ActiveHabitId *uuid.UUID `json:"active_habit_id,omitempty"`
 }
 
-func (um UserModel) toUser() *domain.User {
-	uuidId, _ := uuid.Parse(um.Id)
-	return &domain.User{
-		Id:            uuidId,
-		Nickname:      um.Nickname,
-		CreatedAt:     um.CreatedAt,
-		Birthday:      um.Birthday,
-		ActiveHabitId: um.ActiveHabitId,
-	}
-}
-
 func UserFromDomain(user *domain.User) UserModel {
 	return UserModel{
 		Id:            user.Id.String(),

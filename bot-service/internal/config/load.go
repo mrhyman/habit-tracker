@@ -1,7 +1,9 @@
 package config
 
 import (
+	"context"
 	"flag"
+	"fmt"
 	"github.com/spf13/viper"
 	"log/slog"
 	"os"
@@ -26,26 +28,33 @@ func init() {
 }
 
 func MustLoad() *Config {
-
-	viper.SetConfigFile(getConfigPath())
-
+	ctx := context.Background()
+	configFilePath := getConfigPath(ctx)
+	viper.SetConfigFile(configFilePath)
 	if err := viper.ReadInConfig(); err != nil {
-		log.Error(err.Error())
+		log.ErrorContext(
+			ctx,
+			fmt.Sprintf("Can't read config file %s", configFilePath),
+			slog.String("err", err.Error()),
+		)
 		os.Exit(1)
 	}
 
 	config := &Config{}
 
 	if err := viper.Unmarshal(config); err != nil {
-		log.Error(err.Error())
+		log.ErrorContext(
+			ctx,
+			fmt.Sprintf("Can't parse config file %s", configFilePath),
+			slog.String("err", err.Error()),
+		)
 		os.Exit(1)
 	}
 
 	return config
 }
 
-func getConfigPath() string {
-
+func getConfigPath(ctx context.Context) string {
 	var res string
 
 	flag.StringVar(&res, configPathCLIArg, "", "path to config file")
@@ -54,13 +63,13 @@ func getConfigPath() string {
 	if res == "" {
 		res = os.Getenv(configPathENV)
 		if res != "" {
-			log.Info("Config file not set, using ENV variable")
+			log.InfoContext(ctx, "Config file not set, using ENV variable")
 			return res
 		}
 	}
 
 	if res == "" {
-		log.Info("Config file not set, using default")
+		log.InfoContext(ctx, "Config file not set, using default")
 		return configPathDefault
 	}
 

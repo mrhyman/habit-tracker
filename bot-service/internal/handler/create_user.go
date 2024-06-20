@@ -2,7 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
+	"main/internal/domain"
 	"main/internal/usecase/createuser"
 	"net/http"
 )
@@ -25,14 +26,14 @@ func (h *HttpHandler) CreateUser() http.Handler {
 
 		err = h.CreateUserHandler.Handle(cmd)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			if errors.Is(err, domain.ErrUserAlreadyExists) {
+				http.Error(w, err.Error(), http.StatusConflict)
+			} else {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 
-		if u.toUser().IsAdult() {
-			AdultUserInc.Inc()
-		}
-
-		fmt.Fprintf(w, "Person ID: %s", u.Id)
+		w.WriteHeader(http.StatusCreated)
 	})
 }
