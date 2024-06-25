@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/swaggo/http-swagger/v2"
 	"log/slog"
+	_ "main/docs"
 	"main/internal/handler"
 	"main/internal/server/middleware"
 	"net/http"
@@ -45,10 +47,13 @@ func (s *Server) Shutdown() {
 func SetupMux(h *handler.HttpHandler) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle("/hello", h.Hello())
+	mux.Handle("/ping", h.Ping())
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("POST /createUser", h.CreateUser())
 	mux.Handle("GET /getUser", h.GetUserById())
+	mux.Handle("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 
 	return middleware.LoggingMW(mux)
 }

@@ -8,6 +8,18 @@ import (
 	"net/http"
 )
 
+// CreateUserHandler godoc
+//
+//	@Summary	Create bot user
+//	@Tags		handler
+//	@Accept		json
+//	@Produce	json
+//	@Param		user	body	UserModel	true	"CreateUserRequest"
+//	@Router		/createUser [post]
+//	@Success	201
+//	@Failure	400	{string}	Bad		Request
+//	@Failure	409	{string}	Create	Conflict
+//	@Failure	500	{string}	Server	Error
 func (h *HttpHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var u UserModel

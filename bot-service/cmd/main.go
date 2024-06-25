@@ -18,6 +18,17 @@ import (
 	"main/metrics"
 )
 
+//	@title			Habit Tracker Bot
+//	@version		1.0
+//	@termsOfService	http://swagger.io/terms/
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+//	@host	localhost:8080
+
+//	@externalDocs.description	OpenAPI
+//	@externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	ctx := context.Background()
 	initDefaultLogger()

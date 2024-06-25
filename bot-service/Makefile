@@ -54,3 +54,8 @@ generate:
 .PHONY: test
 test:
 	go test -cover -v ./...
+
+.PHONY: docs
+docs:
+	swag init -g cmd/main.go
+	swag fmt

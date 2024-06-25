@@ -7,11 +7,11 @@ import (
 )
 
 type UserModel struct {
-	Id            string     `json:"id"`
+	Id            string     `json:"id" format:"uuid"`
 	Nickname      string     `json:"nickname"`
-	CreatedAt     time.Time  `json:"createdAt"`
-	Birthday      *time.Time `json:"birthday"`
-	ActiveHabitId *uuid.UUID `json:"active_habit_id,omitempty"`
+	CreatedAt     time.Time  `json:"createdAt" format:"datetime"`
+	Birthday      *time.Time `json:"birthday" format:"datetime"`
+	ActiveHabitId *uuid.UUID `json:"active_habit_id,omitempty" format:"uuid"`
 }
 
 func UserFromDomain(user *domain.User) UserModel {
