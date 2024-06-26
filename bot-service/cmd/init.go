@@ -1,13 +1,23 @@
-package logger
+package main
 
 import (
 	"log/slog"
-	"main/internal/config"
 	"os"
 	"runtime/debug"
+
+	"main/internal/config"
 )
 
-func InitLogger(lc config.LoggerConfig) {
+func initDefaultLogger() {
+	opts := &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelDebug,
+	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
+	slog.SetDefault(logger)
+}
+
+func initLogger(lc config.LoggerConfig) {
 	opts := &slog.HandlerOptions{
 		AddSource: lc.GetAddSource(),
 		Level:     lc.GetLevel(),

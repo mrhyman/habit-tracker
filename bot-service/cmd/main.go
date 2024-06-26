@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/ds248a/closer"
 	"log/slog"
+	"os"
+	"syscall"
+
+	"github.com/ds248a/closer"
+
 	"main/internal/config"
 	"main/internal/database"
 	"main/internal/database/repository"
@@ -11,16 +15,14 @@ import (
 	"main/internal/server"
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
-	"main/logger"
 	"main/metrics"
-	"os"
-	"syscall"
 )
 
 func main() {
 	ctx := context.Background()
+	initDefaultLogger()
 	cfg := config.MustLoad()
-	logger.InitLogger(cfg.Logger)
+	initLogger(cfg.Logger)
 
 	db, err := database.New(ctx, cfg.Database)
 	if err != nil {

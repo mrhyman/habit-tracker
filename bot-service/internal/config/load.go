@@ -4,9 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/spf13/viper"
 	"log/slog"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 const (
@@ -15,24 +16,12 @@ const (
 	configPathDefault = "./config/local.yml"
 )
 
-var (
-	log *slog.Logger
-)
-
-func init() {
-	opts := &slog.HandlerOptions{
-		AddSource: true,
-		Level:     slog.LevelDebug,
-	}
-	log = slog.New(slog.NewJSONHandler(os.Stdout, opts))
-}
-
 func MustLoad() *Config {
 	ctx := context.Background()
 	configFilePath := getConfigPath(ctx)
 	viper.SetConfigFile(configFilePath)
 	if err := viper.ReadInConfig(); err != nil {
-		log.ErrorContext(
+		slog.ErrorContext(
 			ctx,
 			fmt.Sprintf("Can't read config file %s", configFilePath),
 			slog.String("err", err.Error()),
@@ -43,7 +32,7 @@ func MustLoad() *Config {
 	config := &Config{}
 
 	if err := viper.Unmarshal(config); err != nil {
-		log.ErrorContext(
+		slog.ErrorContext(
 			ctx,
 			fmt.Sprintf("Can't parse config file %s", configFilePath),
 			slog.String("err", err.Error()),
@@ -63,13 +52,13 @@ func getConfigPath(ctx context.Context) string {
 	if res == "" {
 		res = os.Getenv(configPathENV)
 		if res != "" {
-			log.InfoContext(ctx, "Config file not set, using ENV variable")
+			slog.InfoContext(ctx, "Config file not set, using ENV variable")
 			return res
 		}
 	}
 
 	if res == "" {
-		log.InfoContext(ctx, "Config file not set, using default")
+		slog.InfoContext(ctx, "Config file not set, using default")
 		return configPathDefault
 	}
 
