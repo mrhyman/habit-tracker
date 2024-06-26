@@ -2,6 +2,7 @@ package createuser
 
 import (
 	"errors"
+
 	"main/internal/domain"
 )
 
@@ -29,7 +30,7 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	}
 
 	if user.IsAdult() {
-		AdultUserInc.Inc()
+		adultUserInc.Inc()
 	}
 
 	return nil
