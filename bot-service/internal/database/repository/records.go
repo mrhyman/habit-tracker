@@ -14,16 +14,6 @@ type UserRecord struct {
 	ActiveHabitId *uuid.UUID `db:"active_habit_id,omitempty"`
 }
 
-func (ur UserRecord) toUser() *domain.User {
-	return &domain.User{
-		Id:            ur.Id,
-		Nickname:      ur.Nickname,
-		CreatedAt:     ur.CreatedAt,
-		Birthday:      ur.Birthday,
-		ActiveHabitId: ur.ActiveHabitId,
-	}
-}
-
 func userFromDomain(user *domain.User) UserRecord {
 	return UserRecord{
 		Id:            user.Id,

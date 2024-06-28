@@ -2,6 +2,7 @@ package createuser
 
 import (
 	"errors"
+
 	"main/internal/domain"
 )
 
@@ -17,6 +18,7 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	user, err = domain.NewUser(
 		cmd.UserId,
 		cmd.UserNickname,
+		cmd.UserCreatedAt,
 		cmd.UserBirthday,
 		cmd.UserActiveHabitId,
 	)
@@ -25,6 +27,10 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	}
 	if err = ch.userRepo.CreateUser(user); err != nil {
 		return err
+	}
+
+	if user.IsAdult() {
+		adultUserInc.Inc()
 	}
 
 	return nil

@@ -117,7 +117,7 @@ func TestCreateUser_success(t *testing.T) {
 			t.Parallel()
 			setup()
 
-			got, err := NewUser(tt.args.Id, tt.args.Nickname, tt.args.Birthday, tt.args.ActiveHabitId)
+			got, err := NewUser(tt.args.Id, tt.args.Nickname, tt.args.CreatedAt, tt.args.Birthday, tt.args.ActiveHabitId)
 
 			if tt.wantErr == "" {
 				require.NoError(t, err)

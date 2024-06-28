@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -9,12 +10,14 @@ import (
 	"os"
 	"sync"
 	"testing"
+	"time"
 )
 
 var (
 	startContainer sync.Once
 	pgc            *postgres.PostgresContainer
 	db             *database.DB
+	testNowUtc     = time.Now().Truncate(time.Microsecond).UTC()
 )
 
 func TestMain(m *testing.M) {
@@ -33,8 +36,8 @@ func TestCreateUser(t *testing.T) {
 	t.Run("Integration_Create_And_Get_User", func(t *testing.T) {
 		t.Parallel()
 
-		repo := NewUserRepository(db.Pool)
-		user, _ := domain.NewUser(uuid.New(), uuid.New().String(), nil, nil)
+		repo := NewUserRepository(context.Background(), db.Pool)
+		user, _ := domain.NewUser(uuid.New(), uuid.New().String(), testNowUtc, nil, nil)
 		err := repo.CreateUser(user)
 		dbRecord, err := repo.GetUserByID(user.Id)
 		require.NoError(t, err)

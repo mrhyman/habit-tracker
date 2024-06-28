@@ -111,13 +111,10 @@ func TestHttpHandler_GetUserById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			sut, mocks := setup(t)
-			mux := sut.SetupMux()
 			tt.setMocks(mocks)
 
-			tArgs := tt.args(t)
-
 			resp := httptest.NewRecorder()
-			mux.ServeHTTP(resp, tArgs.req)
+			sut.GetUserById().ServeHTTP(resp, tt.args(t).req)
 			require.Equal(t, tt.wantCode, resp.Result().StatusCode)
 			require.Equal(t, tt.wantBody, resp.Body.String())
 		})

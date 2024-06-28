@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"log/slog"
+	"os"
+	"syscall"
+
 	"github.com/ds248a/closer"
-	"log"
+
 	"main/internal/config"
 	"main/internal/database"
 	"main/internal/database/repository"
@@ -12,19 +16,22 @@ import (
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
 	"main/metrics"
-	"syscall"
 )
 
 func main() {
 	ctx := context.Background()
+	initDefaultLogger()
 	cfg := config.MustLoad()
+	initLogger(cfg.Logger)
 
 	db, err := database.New(ctx, cfg.Database)
 	if err != nil {
-		log.Fatal("unable to create connection pool:", err)
+		slog.ErrorContext(ctx, "error create db pool", err)
+		os.Exit(1)
 	}
+	closer.Add(db.Close)
 
-	userRepo := repository.NewUserRepository(db.Pool)
+	userRepo := repository.NewUserRepository(ctx, db.Pool)
 
 	httpHandler := handler.New(
 		createuser.NewCommandHandler(userRepo),
@@ -35,8 +42,7 @@ func main() {
 
 	s := server.New(cfg.Port, *httpHandler)
 	go s.Start()
-
-	closer.Add(db.Close)
 	closer.Add(s.Shutdown)
+
 	closer.ListenSignal(syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
 }

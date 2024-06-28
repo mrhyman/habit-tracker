@@ -9,3 +9,6 @@ db:
   timeout: 3s
 graceful_timeout: 30s
 scrape_interval: 2s
+logger:
+  add_source: false
+  level: 0 #info

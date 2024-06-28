@@ -1,8 +1,9 @@
 package metrics
 
 import (
+	"context"
 	"github.com/prometheus/client_golang/prometheus"
-	"log"
+	"log/slog"
 	"main/internal/database/repository"
 	"time"
 )
@@ -23,7 +24,7 @@ func RecordMetrics(repo *repository.UserRepositoryImpl, interval time.Duration) 
 		case <-ticker.C:
 			c, err := repo.AdultUserMetric()
 			if err != nil {
-				log.Println(err)
+				slog.ErrorContext(context.Background(), "get metric error", err)
 			}
 			AdultUserCounter.Set(float64(c))
 		}

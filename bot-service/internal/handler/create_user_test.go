@@ -37,7 +37,7 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 		wantBody string
 	}{
 		{
-			name: "200 ok",
+			name: "201 created",
 			args: func(*testing.T) args {
 				jsonStr, _ := json.Marshal(validUser)
 				req, _ := http.NewRequest("POST", "/createUser", bytes.NewBuffer(jsonStr))
@@ -49,8 +49,7 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 				m.createUserMock.HandleMock.When(cmd).Then(nil)
 
 			},
-			wantCode: http.StatusOK,
-			wantBody: fmt.Sprintf("Person ID: %s", validUser.Id),
+			wantCode: http.StatusCreated,
 		},
 		{
 			name: "400 user decode error",
@@ -101,10 +100,9 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 			t.Parallel()
 
 			sut, mocks := setup(t)
-			mux := sut.SetupMux()
 			tt.setMocks(mocks)
 			resp := httptest.NewRecorder()
-			mux.ServeHTTP(resp, tt.args(t).req)
+			sut.CreateUser().ServeHTTP(resp, tt.args(t).req)
 
 			require.Equal(t, tt.wantCode, resp.Result().StatusCode)
 			require.Equal(t, tt.wantBody, resp.Body.String())

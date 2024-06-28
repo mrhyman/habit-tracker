@@ -14,6 +14,7 @@ var (
 type Command struct {
 	UserId            uuid.UUID
 	UserNickname      string
+	UserCreatedAt     time.Time
 	UserBirthday      *time.Time
 	UserActiveHabitId *uuid.UUID
 }

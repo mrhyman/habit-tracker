@@ -9,4 +9,5 @@ type Config struct {
 	Database                      DatabaseConfig `mapstructure:"db"`
 	GracefulTimeout               time.Duration  `mapstructure:"graceful_timeout"`
 	BusinessMetricsScrapeInterval time.Duration  `mapstructure:"scrape_interval"`
+	Logger                        LoggerConfig   `mapstructure:"logger"`
 }

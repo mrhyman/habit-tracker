@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -11,7 +11,8 @@ func (h *HttpHandler) Hello() http.Handler {
 		fmt.Println("Hello!")
 		_, err := w.Write([]byte("My hello page!"))
 		if err != nil {
-			log.Fatal("write failed:", err)
+			slog.ErrorContext(r.Context(), "hello-handler write error", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 }

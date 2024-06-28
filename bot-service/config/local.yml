@@ -9,3 +9,6 @@ db:
   timeout: 3s
 graceful_timeout: 10s
 scrape_interval: 5s
+logger:
+  add_source: true
+  level: -4 #debug
