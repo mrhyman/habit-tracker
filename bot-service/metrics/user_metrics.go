@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus"
 	"log/slog"
-	"main/internal/database/repository"
+	"main/internal/repo/database/repository"
 	"time"
 )
 

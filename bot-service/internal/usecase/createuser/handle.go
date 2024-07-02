@@ -28,6 +28,10 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	if err = ch.userRepo.CreateUser(user); err != nil {
 		return err
 	}
+	// todo: transaction outbox
+	if err = ch.userEvent.UserCreated(user); err != nil {
+		return err
+	}
 
 	if user.IsAdult() {
 		adultUserInc.Inc()

@@ -3,14 +3,16 @@ package main
 import (
 	"context"
 	"log/slog"
+	"main/internal/repo/database"
+	"main/internal/repo/database/repository"
+	"main/internal/repo/kafka"
+	kafkaRepo "main/internal/repo/kafka/repository"
 	"os"
 	"syscall"
 
 	"github.com/ds248a/closer"
 
 	"main/internal/config"
-	"main/internal/database"
-	"main/internal/database/repository"
 	"main/internal/handler"
 	"main/internal/server"
 	"main/internal/usecase/createuser"
@@ -27,8 +29,8 @@ import (
 
 //	@host	localhost:8080
 
-//	@externalDocs.description	OpenAPI
-//	@externalDocs.url			https://swagger.io/resources/open-api/
+// @externalDocs.description	OpenAPI
+// @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	ctx := context.Background()
 	initDefaultLogger()
@@ -42,10 +44,18 @@ func main() {
 	}
 	closer.Add(db.Close)
 
+	k, err := kafka.New(ctx, cfg.Kafka)
+	if err != nil {
+		slog.ErrorContext(ctx, "error create kafka connection", err)
+		os.Exit(1)
+	}
+	closer.Add(k.Close)
+
 	userRepo := repository.NewUserRepository(ctx, db.Pool)
+	userEventBus := kafkaRepo.NewUserEventBus(ctx, k.SyncProducer)
 
 	httpHandler := handler.New(
-		createuser.NewCommandHandler(userRepo),
+		createuser.NewCommandHandler(userRepo, userEventBus),
 		getuserbyid.NewQueryHandler(userRepo),
 	)
 

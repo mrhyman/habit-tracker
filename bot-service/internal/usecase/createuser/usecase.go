@@ -11,10 +11,15 @@ type iUserRepo interface {
 	GetUserByID(userID uuid.UUID) (*domain.User, error)
 }
 
-type CommandHandler struct {
-	userRepo iUserRepo
+type iUserEventBus interface {
+	UserCreated(user *domain.User) error
 }
 
-func NewCommandHandler(userRepo iUserRepo) *CommandHandler {
-	return &CommandHandler{userRepo: userRepo}
+type CommandHandler struct {
+	userRepo  iUserRepo
+	userEvent iUserEventBus
+}
+
+func NewCommandHandler(userRepo iUserRepo, userEvent iUserEventBus) *CommandHandler {
+	return &CommandHandler{userRepo: userRepo, userEvent: userEvent}
 }

@@ -10,4 +10,5 @@ type Config struct {
 	GracefulTimeout               time.Duration  `mapstructure:"graceful_timeout"`
 	BusinessMetricsScrapeInterval time.Duration  `mapstructure:"scrape_interval"`
 	Logger                        LoggerConfig   `mapstructure:"logger"`
+	Kafka                         KafkaConfig    `mapstructure:"kafka"`
 }
