@@ -2,13 +2,15 @@
 package handler
 
 import (
+	"context"
+
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
 	"main/internal/usecase/getuserbyid"
 )
 
 type iCreateUser interface {
-	Handle(cmd createuser.Command) error
+	Handle(ctx context.Context, cmd createuser.Command) error
 }
 
 type iGetUser interface {

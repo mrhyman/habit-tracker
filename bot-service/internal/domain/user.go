@@ -2,8 +2,9 @@ package domain
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -13,6 +14,7 @@ var (
 )
 
 type User struct {
+	AggregateRoot
 	Id            uuid.UUID
 	Nickname      string
 	CreatedAt     time.Time
@@ -21,8 +23,13 @@ type User struct {
 }
 
 func NewUser(
-	userID uuid.UUID, userName string, createdAt time.Time, birthday *time.Time, activeHabitId *uuid.UUID,
+	userID uuid.UUID,
+	userName string,
+	createdAt time.Time,
+	birthday *time.Time,
+	activeHabitId *uuid.UUID,
 ) (*User, error) {
+	nowUTC := timeNowFn()
 	created := createdAt.UTC()
 	if uuid.Nil == userID {
 		return nil, ErrInvalidUserID
@@ -33,7 +40,7 @@ func NewUser(
 	}
 
 	if time.Time.IsZero(created) {
-		created = timeNowFn()
+		created = nowUTC
 	}
 
 	user := &User{
@@ -43,6 +50,16 @@ func NewUser(
 		Birthday:      birthday,
 		ActiveHabitId: activeHabitId,
 	}
+
+	user.addEvent(NewUserCreatedEvent(
+		uuid.NewString(),
+		nowUTC,
+		user.Id,
+		user.Nickname,
+		user.CreatedAt,
+		user.Birthday,
+		user.ActiveHabitId,
+	))
 
 	return user, nil
 }

@@ -13,5 +13,5 @@ logger:
   add_source: true
   level: -4 #debug
 kafka:
-  host: localhost
-  port: 6502
+  host:
+    - localhost:6502

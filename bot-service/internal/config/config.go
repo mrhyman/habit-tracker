@@ -11,4 +11,5 @@ type Config struct {
 	BusinessMetricsScrapeInterval time.Duration  `mapstructure:"scrape_interval"`
 	Logger                        LoggerConfig   `mapstructure:"logger"`
 	Kafka                         KafkaConfig    `mapstructure:"kafka"`
+	UserEventProducerConfig       ProducerConfig `mapstructure:"user_event_producer_config"`
 }

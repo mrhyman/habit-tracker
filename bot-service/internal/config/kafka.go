@@ -1,14 +1,16 @@
 package config
 
+import "time"
+
 type KafkaConfig struct {
-	Host string `mapstructure:"host"`
-	Port int    `mapstructure:"port"`
+	Host []string `mapstructure:"host"`
 }
 
-func (kc KafkaConfig) GetHost() string {
+func (kc KafkaConfig) GetHost() []string {
 	return kc.Host
 }
 
-func (kc KafkaConfig) GetPort() int {
-	return kc.Port
+type ProducerConfig struct {
+	Topic   string        `mapstructure:"topic"`
+	Timeout time.Duration `mapstructure:"timeout"`
 }

@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"log/slog"
-	"main/internal/repo/database"
-	"main/internal/repo/database/repository"
-	"main/internal/repo/kafka"
-	kafkaRepo "main/internal/repo/kafka/repository"
 	"os"
 	"syscall"
+
+	"main/internal/eventrouter"
+	"main/internal/repo/database"
+	"main/internal/repo/database/repository"
+	"main/internal/repo/kafka/userevent"
 
 	"github.com/ds248a/closer"
 
@@ -44,18 +45,15 @@ func main() {
 	}
 	closer.Add(db.Close)
 
-	k, err := kafka.New(ctx, cfg.Kafka)
-	if err != nil {
-		slog.ErrorContext(ctx, "error create kafka connection", err)
-		os.Exit(1)
-	}
-	closer.Add(k.Close)
+	userEventProducer := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.UserEventProducerConfig)
 
 	userRepo := repository.NewUserRepository(ctx, db.Pool)
-	userEventBus := kafkaRepo.NewUserEventBus(ctx, k.SyncProducer)
+
+	// Event router
+	evenRouter := eventrouter.New(userEventProducer)
 
 	httpHandler := handler.New(
-		createuser.NewCommandHandler(userRepo, userEventBus),
+		createuser.NewCommandHandler(userRepo, evenRouter),
 		getuserbyid.NewQueryHandler(userRepo),
 	)
 

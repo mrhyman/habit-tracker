@@ -3,9 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
-	"net/http"
 )
 
 // CreateUserHandler godoc
@@ -36,7 +37,7 @@ func (h *HttpHandler) CreateUser() http.Handler {
 			return
 		}
 
-		err = h.CreateUserHandler.Handle(cmd)
+		err = h.CreateUserHandler.Handle(r.Context(), cmd)
 		if err != nil {
 			if errors.Is(err, domain.ErrUserAlreadyExists) {
 				http.Error(w, err.Error(), http.StatusConflict)

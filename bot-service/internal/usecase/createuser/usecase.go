@@ -2,7 +2,10 @@
 package createuser
 
 import (
+	"context"
+
 	"github.com/google/uuid"
+
 	"main/internal/domain"
 )
 
@@ -11,15 +14,15 @@ type iUserRepo interface {
 	GetUserByID(userID uuid.UUID) (*domain.User, error)
 }
 
-type iUserEventBus interface {
-	UserCreated(user *domain.User) error
+type iEventRouter interface {
+	RouteAllEvents(ctx context.Context, events []domain.Event) error
 }
 
 type CommandHandler struct {
-	userRepo  iUserRepo
-	userEvent iUserEventBus
+	userRepo    iUserRepo
+	eventRouter iEventRouter
 }
 
-func NewCommandHandler(userRepo iUserRepo, userEvent iUserEventBus) *CommandHandler {
-	return &CommandHandler{userRepo: userRepo, userEvent: userEvent}
+func NewCommandHandler(userRepo iUserRepo, eventRouter iEventRouter) *CommandHandler {
+	return &CommandHandler{userRepo: userRepo, eventRouter: eventRouter}
 }

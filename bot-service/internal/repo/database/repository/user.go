@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"log/slog"
+
 	"main/internal/domain"
-	"time"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -62,7 +64,13 @@ func (r *UserRepositoryImpl) GetUserByID(id uuid.UUID) (*domain.User, error) {
 		return nil, err
 	}
 
-	return domain.NewUser(ur.Id, ur.Nickname, ur.CreatedAt, ur.Birthday, ur.ActiveHabitId)
+	return &domain.User{
+		Id:            ur.Id,
+		Nickname:      ur.Nickname,
+		CreatedAt:     ur.CreatedAt,
+		Birthday:      ur.Birthday,
+		ActiveHabitId: ur.ActiveHabitId,
+	}, nil
 }
 
 func (r *UserRepositoryImpl) SetBirthday(ctx context.Context, id string, b time.Time) error {

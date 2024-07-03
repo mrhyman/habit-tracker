@@ -1,12 +1,13 @@
 package createuser
 
 import (
+	"context"
 	"errors"
 
 	"main/internal/domain"
 )
 
-func (ch CommandHandler) Handle(cmd Command) error {
+func (ch CommandHandler) Handle(ctx context.Context, cmd Command) error {
 	user, err := ch.userRepo.GetUserByID(cmd.UserId)
 	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return err
@@ -28,14 +29,10 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	if err = ch.userRepo.CreateUser(user); err != nil {
 		return err
 	}
-	// todo: transaction outbox
-	if err = ch.userEvent.UserCreated(user); err != nil {
-		return err
-	}
 
 	if user.IsAdult() {
 		adultUserInc.Inc()
 	}
 
-	return nil
+	return ch.eventRouter.RouteAllEvents(ctx, user.PopAllEvents())
 }
