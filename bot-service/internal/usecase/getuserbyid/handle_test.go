@@ -89,7 +89,7 @@ func TestUC_Handle(t *testing.T) {
 			sut, sutMocks := setup(t)
 			tt.setMocks(sutMocks)
 
-			user, err := sut.Handle(tt.args.query)
+			user, err := sut.Handle(nil, tt.args.query)
 
 			if tt.wantErr == "" {
 				require.NoError(t, err)

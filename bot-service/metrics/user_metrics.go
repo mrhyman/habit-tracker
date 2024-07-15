@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus"
 	"log/slog"
-	"main/internal/repo/database/repository"
+	"main/internal/repo/database"
 	"time"
 )
 
@@ -15,7 +15,7 @@ var (
 	}))
 )
 
-func RecordMetrics(repo *repository.UserRepositoryImpl, interval time.Duration) {
+func RecordMetrics(repo *database.UserRepositoryImpl, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
@@ -24,7 +24,11 @@ func RecordMetrics(repo *repository.UserRepositoryImpl, interval time.Duration) 
 		case <-ticker.C:
 			c, err := repo.AdultUserMetric()
 			if err != nil {
-				slog.ErrorContext(context.Background(), "get metric error", err)
+				slog.ErrorContext(
+					context.Background(),
+					"get metric error",
+					slog.String("err", err.Error()),
+				)
 			}
 			AdultUserCounter.Set(float64(c))
 		}

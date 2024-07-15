@@ -33,7 +33,7 @@ func (h *HttpHandler) GetUserById() http.Handler {
 			return
 		}
 
-		u, err := h.GetUserByIdHandler.Handle(q)
+		u, err := h.GetUserByIdHandler.Handle(r.Context(), q)
 		if err != nil {
 			if errors.Is(err, domain.ErrUserNotFound) {
 				http.Error(w, err.Error(), http.StatusNotFound)

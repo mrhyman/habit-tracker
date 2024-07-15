@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"main/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +24,7 @@ type User struct {
 }
 
 func NewUser(
+	uuidGenerator utils.UUIDGenerator,
 	userID uuid.UUID,
 	userName string,
 	createdAt time.Time,
@@ -52,7 +54,7 @@ func NewUser(
 	}
 
 	user.addEvent(NewUserCreatedEvent(
-		uuid.NewString(),
+		uuidGenerator.NewString(),
 		nowUTC,
 		user.Id,
 		user.Nickname,

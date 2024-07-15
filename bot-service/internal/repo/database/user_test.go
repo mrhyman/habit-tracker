@@ -1,4 +1,4 @@
-package repository
+package database
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"main/internal/domain"
-	"main/internal/repo/database"
 	"os"
 	"sync"
 	"testing"
@@ -16,15 +15,15 @@ import (
 var (
 	startContainer sync.Once
 	pgc            *postgres.PostgresContainer
-	db             *database.DB
+	db             *DB
 	testNowUtc     = time.Now().Truncate(time.Microsecond).UTC()
 )
 
 func TestMain(m *testing.M) {
 	startContainer.Do(func() {
-		pgc, db = database.StartDbContainer("init.sh")
+		pgc, db = StartDbContainer("init.sh")
 	})
-	defer database.StopDbContainer(pgc, db)
+	defer StopDbContainer(pgc, db)
 
 	code := m.Run()
 

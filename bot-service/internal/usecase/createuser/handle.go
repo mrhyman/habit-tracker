@@ -3,6 +3,7 @@ package createuser
 import (
 	"context"
 	"errors"
+	"main/utils"
 
 	"main/internal/domain"
 )
@@ -17,6 +18,7 @@ func (ch CommandHandler) Handle(ctx context.Context, cmd Command) error {
 	}
 
 	user, err = domain.NewUser(
+		utils.RealUUIDGenerator{},
 		cmd.UserId,
 		cmd.UserNickname,
 		cmd.UserCreatedAt,

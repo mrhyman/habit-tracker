@@ -9,7 +9,7 @@ type Config struct {
 	Database                      DatabaseConfig `mapstructure:"db"`
 	GracefulTimeout               time.Duration  `mapstructure:"graceful_timeout"`
 	BusinessMetricsScrapeInterval time.Duration  `mapstructure:"scrape_interval"`
-	Logger                        LoggerConfig   `mapstructure:"logger"`
+	Logger                        LoggerConfig   `mapstructure:"utils"`
 	Kafka                         KafkaConfig    `mapstructure:"kafka"`
 	UserEventProducerConfig       ProducerConfig `mapstructure:"user_event_producer_config"`
 }

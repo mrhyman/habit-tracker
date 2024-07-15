@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	"log/slog"
-	"os"
+	"main/utils"
 	"syscall"
 
 	"main/internal/eventrouter"
 	"main/internal/repo/database"
-	"main/internal/repo/database/repository"
 	"main/internal/repo/kafka/userevent"
 
 	"github.com/ds248a/closer"
@@ -40,17 +38,19 @@ func main() {
 
 	db, err := database.New(ctx, cfg.Database)
 	if err != nil {
-		slog.ErrorContext(ctx, "error create db pool", err)
-		os.Exit(1)
+		utils.LogFatal(ctx, "error create db pool", err)
 	}
 	closer.Add(db.Close)
 
-	userEventProducer := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.UserEventProducerConfig)
+	userEventProducer, err := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.UserEventProducerConfig)
+	if err != nil {
+		utils.LogFatal(ctx, "error create event producer", err)
+	}
 
-	userRepo := repository.NewUserRepository(ctx, db.Pool)
+	userRepo := database.NewUserRepository(ctx, db.Pool)
 
 	// Event router
-	evenRouter := eventrouter.New(userEventProducer)
+	evenRouter := eventrouter.NewService(userEventProducer)
 
 	httpHandler := handler.New(
 		createuser.NewCommandHandler(userRepo, evenRouter),

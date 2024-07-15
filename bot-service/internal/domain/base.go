@@ -1,11 +1,16 @@
 package domain
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 var (
-	timeNowFn = func() time.Time {
+	onceTimeNowFn sync.Once
+	timeNowFn     = func() time.Time {
 		return time.Now().UTC()
 	}
+	testNowUtc = time.Now().Truncate(time.Microsecond).UTC()
 )
 
 // Event контракт доменного события.
@@ -44,4 +49,12 @@ func (a *AggregateRoot) PopAllEvents() []Event {
 
 func (a *AggregateRoot) addEvent(e Event) {
 	a.events = append(a.events, e)
+}
+
+func setup() {
+	onceTimeNowFn.Do(func() {
+		timeNowFn = func() time.Time {
+			return testNowUtc
+		}
+	})
 }

@@ -2,7 +2,7 @@ package eventrouter
 
 import (
 	"context"
-
+	"fmt"
 	"main/internal/domain"
 )
 
@@ -19,8 +19,10 @@ func (s *Service) RouteAllEvents(ctx context.Context, events []domain.Event) err
 
 func (s *Service) routeEvent(ctx context.Context, event domain.Event) error {
 	switch ev := event.(type) {
-	case domain.UserCreatedEvent:
-		return s.userEvenRepo.SendUserCreatedEvent(ctx, ev)
+	case *domain.UserCreatedEvent:
+		return s.userEventRepo.SendUserCreatedEvent(ctx, *ev)
+	default:
+		fmt.Println(ev)
 	}
 
 	return nil

@@ -2,11 +2,9 @@ package userevent
 
 import (
 	"context"
-	"log/slog"
-	"os"
-
 	"github.com/IBM/sarama"
 	"github.com/ds248a/closer"
+	"main/utils"
 
 	"main/internal/config"
 )
@@ -19,9 +17,15 @@ type Repo struct {
 func NewRepo(ctx context.Context, addr []string, config config.ProducerConfig) (*Repo, error) {
 	// Kafka producer
 	saramaConfig := sarama.NewConfig()
-	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
-	saramaConfig.Producer.Compression = sarama.CompressionSnappy
-	saramaConfig.Producer.Timeout = config.Timeout
+	saramaConfig.Producer.RequiredAcks = config.RequiredAcks
+	saramaConfig.Producer.Compression = config.CompressionCodec
+	saramaConfig.Producer.Retry.Max = config.Retry.Max
+	saramaConfig.Producer.Retry.Backoff = config.Retry.Backoff
+	saramaConfig.Producer.Timeout = config.RequestTimeout
+	saramaConfig.Producer.Idempotent = config.Idempotent
+	saramaConfig.Producer.Return.Successes = config.ReturnSuccesses
+
+	saramaConfig.Net.MaxOpenRequests = config.MaxInFlightRequestsPerConnection
 
 	producer, err := sarama.NewSyncProducer(addr, saramaConfig)
 	if err != nil {
@@ -29,8 +33,7 @@ func NewRepo(ctx context.Context, addr []string, config config.ProducerConfig) (
 	}
 	closer.Add(func() {
 		if err = producer.Close(); err != nil {
-			slog.ErrorContext(ctx, "error close kafka producer", err)
-			os.Exit(1)
+			utils.LogFatal(ctx, "error close kafka producer", err)
 		}
 	})
 

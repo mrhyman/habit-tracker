@@ -14,7 +14,7 @@ type iCreateUser interface {
 }
 
 type iGetUser interface {
-	Handle(q getuserbyid.Query) (*domain.User, error)
+	Handle(ctx context.Context, q getuserbyid.Query) (*domain.User, error)
 }
 
 type HttpHandler struct {

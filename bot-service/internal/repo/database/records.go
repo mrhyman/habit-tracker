@@ -1,4 +1,4 @@
-package repository
+package database
 
 import (
 	"github.com/google/uuid"
