@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,6 +24,7 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 		cmd       = createuser.Command{UserId: userId, UserNickname: nickname}
 		validUser = domain.User{Id: userId, Nickname: nickname}
 		someError = errors.New("some error")
+		ctx       = context.Background()
 	)
 
 	type args struct {
@@ -46,8 +48,7 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 				}
 			},
 			setMocks: func(m mocks) {
-				m.createUserMock.HandleMock.When(cmd).Then(nil)
-
+				m.createUserMock.HandleMock.When(ctx, cmd).Then(nil)
 			},
 			wantCode: http.StatusCreated,
 		},
@@ -87,7 +88,7 @@ func TestHttpHandler_CreateUser(t *testing.T) {
 				}
 			},
 			setMocks: func(m mocks) {
-				m.createUserMock.HandleMock.When(cmd).Then(someError)
+				m.createUserMock.HandleMock.When(ctx, cmd).Then(someError)
 			},
 			wantCode: http.StatusInternalServerError,
 			wantBody: fmt.Sprintf("%s\n", someError.Error()),

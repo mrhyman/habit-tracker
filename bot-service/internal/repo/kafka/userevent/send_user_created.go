@@ -31,7 +31,7 @@ func (r Repo) SendUserCreatedEvent(ctx context.Context, event domain.UserCreated
 	slog.InfoContext(
 		ctx,
 		fmt.Sprintf("user_created event sent to partition %d at offset %d", p, o),
-		event,
+		slog.String("event_id", event.EventBase.ID()),
 	)
 
 	return nil

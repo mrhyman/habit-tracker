@@ -37,18 +37,18 @@ func (e EventBase) HappenedAt() time.Time {
 
 // AggregateRoot базовый агрегат.
 type AggregateRoot struct {
-	events []Event
+	Events []Event
 }
 
 // PopAllEvents возвращает все доменные события и отчищает их.
 func (a *AggregateRoot) PopAllEvents() []Event {
-	res := a.events
-	a.events = nil
+	res := a.Events
+	a.Events = nil
 	return res
 }
 
 func (a *AggregateRoot) addEvent(e Event) {
-	a.events = append(a.events, e)
+	a.Events = append(a.Events, e)
 }
 
 func setup() {

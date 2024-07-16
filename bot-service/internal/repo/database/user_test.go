@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"main/internal/domain"
+	"main/utils"
 	"os"
 	"sync"
 	"testing"
@@ -17,6 +18,7 @@ var (
 	pgc            *postgres.PostgresContainer
 	db             *DB
 	testNowUtc     = time.Now().Truncate(time.Microsecond).UTC()
+	uuidGenerator  = utils.FakeUUIDGenerator{FixedUUID: uuid.NewString()}
 )
 
 func TestMain(m *testing.M) {
@@ -36,10 +38,17 @@ func TestCreateUser(t *testing.T) {
 		t.Parallel()
 
 		repo := NewUserRepository(context.Background(), db.Pool)
-		user, _ := domain.NewUser(uuid.New(), uuid.New().String(), testNowUtc, nil, nil)
+		user, _ := domain.NewUser(uuidGenerator, uuid.New(), uuid.New().String(), testNowUtc, nil, nil)
 		err := repo.CreateUser(user)
 		dbRecord, err := repo.GetUserByID(user.Id)
 		require.NoError(t, err)
-		require.Equal(t, user, dbRecord)
+		require.Equal(t, &domain.User{
+			Id:            user.Id,
+			Nickname:      user.Nickname,
+			CreatedAt:     user.CreatedAt,
+			Birthday:      nil,
+			ActiveHabitId: nil,
+			AggregateRoot: domain.AggregateRoot{Events: nil},
+		}, dbRecord)
 	})
 }

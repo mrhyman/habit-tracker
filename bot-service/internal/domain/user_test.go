@@ -13,10 +13,10 @@ func TestCreateUser(t *testing.T) {
 
 	var (
 		validUserId        = uuid.New()
-		validNickname      = "Some_userName"
+		validNickname      = uuid.NewString()
 		validBirthday      = testNowUtc.AddDate(-10, 0, 0)
 		validActiveHabitId = uuid.New()
-		uuidGenerator      = utils.FakeUUIDGenerator{FixedUUID: "82a89365-2a1e-4ed9-a373-057a7694d458"}
+		uuidGenerator      = utils.FakeUUIDGenerator{FixedUUID: uuid.NewString()}
 	)
 
 	type args struct {
@@ -46,7 +46,7 @@ func TestCreateUser(t *testing.T) {
 				CreatedAt:     testNowUtc,
 				Birthday:      &validBirthday,
 				ActiveHabitId: &validActiveHabitId,
-				AggregateRoot: AggregateRoot{events: []Event{NewUserCreatedEvent(
+				AggregateRoot: AggregateRoot{Events: []Event{NewUserCreatedEvent(
 					uuidGenerator.NewString(),
 					testNowUtc,
 					validUserId,
@@ -72,7 +72,7 @@ func TestCreateUser(t *testing.T) {
 				CreatedAt:     testNowUtc,
 				Birthday:      nil,
 				ActiveHabitId: nil,
-				AggregateRoot: AggregateRoot{events: []Event{NewUserCreatedEvent(
+				AggregateRoot: AggregateRoot{Events: []Event{NewUserCreatedEvent(
 					uuidGenerator.NewString(),
 					testNowUtc,
 					validUserId,

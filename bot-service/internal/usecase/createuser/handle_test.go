@@ -1,6 +1,7 @@
 package createuser
 
 import (
+	"context"
 	"errors"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -11,16 +12,19 @@ import (
 )
 
 type mocks struct {
-	userRepoMock *createUser.IUserRepoMock
+	userRepoMock    *createUser.IUserRepoMock
+	eventRouterMock *createUser.IEventRouterMock
 }
 
 func setup(t *testing.T) (*CommandHandler, mocks) {
 	userRepoMock := createUser.NewIUserRepoMock(t)
+	eventRouterMock := createUser.NewIEventRouterMock(t)
 
-	sut := NewCommandHandler(userRepoMock)
+	sut := NewCommandHandler(userRepoMock, eventRouterMock)
 
 	return sut, mocks{
-		userRepoMock: userRepoMock,
+		userRepoMock:    userRepoMock,
+		eventRouterMock: eventRouterMock,
 	}
 }
 
@@ -55,6 +59,7 @@ func TestUC_Handle(t *testing.T) {
 				m.userRepoMock.GetUserByIDMock.When(cmd.UserId).Then(nil, domain.ErrUserNotFound)
 				m.userRepoMock.CreateUserMock.Set(func(user *domain.User) (err error) {
 					require.Equal(t, validUser.Id, user.Id)
+					m.eventRouterMock.RouteAllEventsMock.When(context.Background(), user.Events).Then(nil)
 					return nil
 				})
 			},
@@ -90,10 +95,11 @@ func TestUC_Handle(t *testing.T) {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := context.Background()
 			sut, sutMocks := setup(t)
 			tt.setMocks(sutMocks)
 
-			err := sut.Handle(tt.args.cmd)
+			err := sut.Handle(ctx, tt.args.cmd)
 
 			if tt.wantErr == "" {
 				require.NoError(t, err)
