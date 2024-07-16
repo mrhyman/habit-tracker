@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func TestCreateEvent(t *testing.T) {
+func TestNewUserCreatedEvent(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -93,6 +93,63 @@ func TestCreateEvent(t *testing.T) {
 				tt.args.createdAt,
 				tt.args.birthday,
 				tt.args.activeHabitId,
+			)
+
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestNewHabitActivatedEvent(t *testing.T) {
+	t.Parallel()
+
+	var (
+		validUserId   = uuid.New()
+		validHabitId  = uuid.New()
+		uuidGenerator = utils.FakeUUIDGenerator{FixedUUID: uuid.NewString()}
+	)
+
+	type args struct {
+		eventID string
+		now     time.Time
+		userID  uuid.UUID
+		habitId uuid.UUID
+	}
+	tests := []struct {
+		name string
+		args args
+		want *HabitActivatedEvent
+	}{
+		{
+			name: "success_all_args",
+			args: args{
+				eventID: uuidGenerator.NewString(),
+				now:     testNowUtc,
+				userID:  validUserId,
+				habitId: validHabitId,
+			},
+			want: &HabitActivatedEvent{
+				EventBase: EventBase{
+					id:         uuidGenerator.NewString(),
+					happenedAt: testNowUtc,
+				},
+				UserID:  validUserId,
+				HabitId: validHabitId,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		tt := test
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			setup()
+
+			got := NewHabitActivatedEvent(
+				uuidGenerator.NewString(),
+				testNowUtc,
+				tt.args.userID,
+				tt.args.habitId,
 			)
 
 			require.Equal(t, tt.want, got)

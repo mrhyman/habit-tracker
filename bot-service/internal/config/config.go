@@ -3,13 +3,14 @@ package config
 import "time"
 
 type Config struct {
-	AppName                       string         `mapstructure:"app_name"`
-	Env                           string         `mapstructure:"env"`
-	Port                          int            `mapstructure:"port"`
-	Database                      DatabaseConfig `mapstructure:"db"`
-	GracefulTimeout               time.Duration  `mapstructure:"graceful_timeout"`
-	BusinessMetricsScrapeInterval time.Duration  `mapstructure:"scrape_interval"`
-	Logger                        LoggerConfig   `mapstructure:"utils"`
-	Kafka                         KafkaConfig    `mapstructure:"kafka"`
-	UserEventProducerConfig       ProducerConfig `mapstructure:"user_event_producer_config"`
+	AppName                           string         `mapstructure:"app_name"`
+	Env                               string         `mapstructure:"env"`
+	Port                              int            `mapstructure:"port"`
+	Database                          DatabaseConfig `mapstructure:"db"`
+	GracefulTimeout                   time.Duration  `mapstructure:"graceful_timeout"`
+	BusinessMetricsScrapeInterval     time.Duration  `mapstructure:"scrape_interval"`
+	Logger                            LoggerConfig   `mapstructure:"utils"`
+	Kafka                             KafkaConfig    `mapstructure:"kafka"`
+	UserCreatedEventProducerConfig    ProducerConfig `mapstructure:"user_created_event_producer_config"`
+	HabitActivatedEventProducerConfig ProducerConfig `mapstructure:"habit_activated_event_producer_config"`
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"main/internal/usecase/activatehabit"
 	"main/utils"
 	"syscall"
 
@@ -42,7 +43,8 @@ func main() {
 	}
 	closer.Add(db.Close)
 
-	userEventProducer, err := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.UserEventProducerConfig)
+	userCreatedEventProducer, err := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.UserCreatedEventProducerConfig)
+	habitActivatedEventProducer, err := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.HabitActivatedEventProducerConfig)
 	if err != nil {
 		utils.LogFatal(ctx, "error create event producer", err)
 	}
@@ -50,11 +52,12 @@ func main() {
 	userRepo := database.NewUserRepository(ctx, db.Pool)
 
 	// Event router
-	evenRouter := eventrouter.NewService(userEventProducer)
+	eventRouter := eventrouter.NewService(userCreatedEventProducer, habitActivatedEventProducer)
 
 	httpHandler := handler.New(
-		createuser.NewCommandHandler(userRepo, evenRouter),
+		createuser.NewCommandHandler(userRepo, eventRouter),
 		getuserbyid.NewQueryHandler(userRepo),
+		activatehabit.NewCommandHandler(userRepo, eventRouter),
 	)
 
 	go metrics.RecordMetrics(userRepo, cfg.BusinessMetricsScrapeInterval)

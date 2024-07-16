@@ -73,16 +73,16 @@ func (r *UserRepositoryImpl) GetUserByID(id uuid.UUID) (*domain.User, error) {
 	}, nil
 }
 
-func (r *UserRepositoryImpl) SetBirthday(ctx context.Context, id string, b time.Time) error {
+func (r *UserRepositoryImpl) SetBirthday(id string, b time.Time) error {
 	query := `UPDATE users SET birthday = $1 WHERE id = $2`
 	slog.DebugContext(r.ctx, "update user DB record birthday", slog.String("query_pÏarams", fmt.Sprintf("id: %s, birthday: %s", id, b)))
-	_, err := r.conn.Exec(ctx, query, b, id)
+	_, err := r.conn.Exec(r.ctx, query, b, id)
 	return err
 }
 
-func (r *UserRepositoryImpl) ActivateHabit(ctx context.Context, id string, h string) error {
+func (r *UserRepositoryImpl) ActivateHabit(id uuid.UUID, h uuid.UUID) error {
 	query := `UPDATE users SET active_habit_id = $1 WHERE id = $2`
 	slog.DebugContext(r.ctx, "update user DB record habit", "query_params", fmt.Sprintf("id: %s, habit: %s", id, h))
-	_, err := r.conn.Exec(ctx, query, h, id)
+	_, err := r.conn.Exec(r.ctx, query, h, id)
 	return err
 }

@@ -16,7 +16,7 @@ import (
 //	@Accept		json
 //	@Produce	json
 //	@Param		user	body	UserModel	true	"CreateUserRequest"
-//	@Router		/createUser [post]
+//	@Router		/user/create [post]
 //	@Success	201
 //	@Failure	400	{string}	Bad		Request
 //	@Failure	409	{string}	Create	Conflict

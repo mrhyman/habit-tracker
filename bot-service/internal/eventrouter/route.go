@@ -20,7 +20,9 @@ func (s *Service) RouteAllEvents(ctx context.Context, events []domain.Event) err
 func (s *Service) routeEvent(ctx context.Context, event domain.Event) error {
 	switch ev := event.(type) {
 	case *domain.UserCreatedEvent:
-		return s.userEventRepo.SendUserCreatedEvent(ctx, *ev)
+		return s.userCreatedEventRepo.SendUserCreatedEvent(ctx, *ev)
+	case *domain.HabitActivatedEvent:
+		return s.habitActivatedEventRepo.SendHabitActivatedEvent(ctx, *ev)
 	default:
 		fmt.Println(ev)
 	}

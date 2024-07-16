@@ -14,6 +14,11 @@ type UserModel struct {
 	ActiveHabitId *uuid.UUID `json:"active_habit_id,omitempty" format:"uuid"`
 }
 
+type HabitActivationModel struct {
+	UserId  string `json:"user_id" format:"uuid"`
+	HabitId string `json:"active_habit_id" format:"uuid"`
+}
+
 func UserFromDomain(user *domain.User) UserModel {
 	return UserModel{
 		Id:            user.Id.String(),

@@ -18,7 +18,7 @@ var (
 //	@Tags		handler
 //	@Produce	json
 //	@Param		id	query	string	true	"uuid formatted ID"
-//	@Router		/getUser [get]
+//	@Router		/user/search [get]
 //	@Success	200	{object}	UserModel
 //	@Failure	400	{string}	Bad		Request
 //	@Failure	404	{string}	User	Not	Found

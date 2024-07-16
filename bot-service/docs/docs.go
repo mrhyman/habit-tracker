@@ -20,7 +20,68 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/createUser": {
+        "/ping": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "handler"
+                ],
+                "summary": "Ping",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/activateHabit": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "handler"
+                ],
+                "summary": "Activate user habit",
+                "parameters": [
+                    {
+                        "description": "HabitActivationRequest",
+                        "name": "habitActivation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.HabitActivationModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/create": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -68,7 +129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/getUser": {
+        "/user/search": {
             "get": {
                 "produces": [
                     "application/json"
@@ -113,28 +174,22 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/ping": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "handler"
-                ],
-                "summary": "Ping",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
+        "handler.HabitActivationModel": {
+            "type": "object",
+            "properties": {
+                "active_habit_id": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "user_id": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        },
         "handler.UserModel": {
             "type": "object",
             "properties": {

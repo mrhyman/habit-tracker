@@ -3,6 +3,7 @@ package handler
 
 import (
 	"context"
+	"main/internal/usecase/activatehabit"
 
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
@@ -17,17 +18,24 @@ type iGetUser interface {
 	Handle(ctx context.Context, q getuserbyid.Query) (*domain.User, error)
 }
 
+type iActivateHabit interface {
+	Handle(ctx context.Context, cmd activatehabit.Command) error
+}
+
 type HttpHandler struct {
-	CreateUserHandler  iCreateUser
-	GetUserByIdHandler iGetUser
+	CreateUserHandler    iCreateUser
+	GetUserByIdHandler   iGetUser
+	ActivateHabitHandler iActivateHabit
 }
 
 func New(
 	createUserHandler iCreateUser,
 	getUserByIdHandler iGetUser,
+	activateHabitHandler iActivateHabit,
 ) *HttpHandler {
 	return &HttpHandler{
-		CreateUserHandler:  createUserHandler,
-		GetUserByIdHandler: getUserByIdHandler,
+		CreateUserHandler:    createUserHandler,
+		GetUserByIdHandler:   getUserByIdHandler,
+		ActivateHabitHandler: activateHabitHandler,
 	}
 }

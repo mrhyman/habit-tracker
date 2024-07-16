@@ -53,7 +53,7 @@ func NewUser(
 		ActiveHabitId: activeHabitId,
 	}
 
-	user.addEvent(NewUserCreatedEvent(
+	user.AddEvent(NewUserCreatedEvent(
 		uuidGenerator.NewString(),
 		nowUTC,
 		user.Id,

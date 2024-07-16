@@ -47,8 +47,9 @@ func SetupMux(h *handler.HttpHandler) http.Handler {
 
 	mux.Handle("/ping", h.Ping())
 	mux.Handle("/metrics", promhttp.Handler())
-	mux.Handle("POST /createUser", h.CreateUser())
-	mux.Handle("GET /getUser", h.GetUserById())
+	mux.Handle("POST /user/create", h.CreateUser())
+	mux.Handle("GET /user/search", h.GetUserById())
+	mux.Handle("PUT /user/activateHabit", h.ActivateHabit())
 	mux.Handle("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
 	))

@@ -1,4 +1,13 @@
 definitions:
+  handler.HabitActivationModel:
+    properties:
+      active_habit_id:
+        format: uuid
+        type: string
+      user_id:
+        format: uuid
+        type: string
+    type: object
   handler.UserModel:
     properties:
       active_habit_id:
@@ -29,7 +38,46 @@ info:
   title: Habit Tracker Bot
   version: "1.0"
 paths:
-  /createUser:
+  /ping:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Ping
+      tags:
+      - handler
+  /user/activateHabit:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: HabitActivationRequest
+        in: body
+        name: habitActivation
+        required: true
+        schema:
+          $ref: '#/definitions/handler.HabitActivationModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Activate user habit
+      tags:
+      - handler
+  /user/create:
     post:
       consumes:
       - application/json
@@ -60,7 +108,7 @@ paths:
       summary: Create bot user
       tags:
       - handler
-  /getUser:
+  /user/search:
     get:
       parameters:
       - description: uuid formatted ID
@@ -88,18 +136,6 @@ paths:
           schema:
             type: string
       summary: Get bot user
-      tags:
-      - handler
-  /ping:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Ping
       tags:
       - handler
 swagger: "2.0"

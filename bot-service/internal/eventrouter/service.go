@@ -7,18 +7,24 @@ import (
 )
 
 //go:generate minimock -g -s .go -o ../../mocks/eventrouter
-type iUserEventRepo interface {
+type iUserCreatedEventRepo interface {
 	SendUserCreatedEvent(ctx context.Context, event domain.UserCreatedEvent) error
+}
+
+type iHabitActivatedEventRepo interface {
+	SendHabitActivatedEvent(ctx context.Context, event domain.HabitActivatedEvent) error
 }
 
 // Service сервис маршрутизации доменных событий.
 type Service struct {
-	userEventRepo iUserEventRepo
+	userCreatedEventRepo    iUserCreatedEventRepo
+	habitActivatedEventRepo iHabitActivatedEventRepo
 }
 
 // NewService возвращает новый Service.
-func NewService(userEvenRepo iUserEventRepo) *Service {
+func NewService(userEvenRepo iUserCreatedEventRepo, habitActivatedEventRepo iHabitActivatedEventRepo) *Service {
 	return &Service{
-		userEventRepo: userEvenRepo,
+		userCreatedEventRepo:    userEvenRepo,
+		habitActivatedEventRepo: habitActivatedEventRepo,
 	}
 }
