@@ -1,17 +1,15 @@
-package userevent
+package usercreated
 
 import (
 	"context"
 	"fmt"
-	"log/slog"
-
 	"github.com/IBM/sarama"
 	"github.com/google/uuid"
-
+	"log/slog"
 	"main/internal/domain"
 )
 
-type UserCreatedMessage struct {
+type Message struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
@@ -23,9 +21,6 @@ func (r Repo) SendUserCreatedEvent(ctx context.Context, event domain.UserCreated
 	}
 	p, o, err := r.pr.SendMessage(msg)
 	if err != nil {
-		slog.ErrorContext(
-			ctx, "FAILED to send user_created event", slog.String("err", err.Error()),
-		)
 		return err
 	}
 	slog.InfoContext(

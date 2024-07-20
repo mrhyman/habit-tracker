@@ -15,7 +15,7 @@ var (
 	}))
 )
 
-func RecordMetrics(repo *database.UserRepositoryImpl, interval time.Duration) {
+func RecordMetrics(repo *database.UserRepo, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 

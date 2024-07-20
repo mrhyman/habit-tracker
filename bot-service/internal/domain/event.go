@@ -44,11 +44,11 @@ func (a *AggregateRoot) AddEvent(e Event) {
 
 type UserCreatedEvent struct {
 	EventBase
-	UserID        uuid.UUID
-	Nickname      string
-	CreatedAt     time.Time
-	Birthday      *time.Time
-	ActiveHabitId *uuid.UUID
+	UserID         uuid.UUID
+	Nickname       string
+	CreatedAt      time.Time
+	Birthday       *time.Time
+	ActiveHabitIds []uuid.UUID
 }
 
 type HabitActivatedEvent struct {
@@ -64,18 +64,18 @@ func NewUserCreatedEvent(
 	nickname string,
 	createdAt time.Time,
 	birthday *time.Time,
-	activeHabitId *uuid.UUID,
+	activeHabitIds []uuid.UUID,
 ) *UserCreatedEvent {
 	return &UserCreatedEvent{
 		EventBase: EventBase{
 			id:         eventID,
 			happenedAt: now,
 		},
-		UserID:        userID,
-		Nickname:      nickname,
-		CreatedAt:     createdAt,
-		Birthday:      birthday,
-		ActiveHabitId: activeHabitId,
+		UserID:         userID,
+		Nickname:       nickname,
+		CreatedAt:      createdAt,
+		Birthday:       birthday,
+		ActiveHabitIds: activeHabitIds,
 	}
 }
 

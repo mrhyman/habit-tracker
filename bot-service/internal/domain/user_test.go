@@ -3,7 +3,7 @@ package domain
 import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"main/utils"
+	"main/pkg"
 	"testing"
 	"time"
 )
@@ -16,7 +16,7 @@ func TestCreateUser(t *testing.T) {
 		validNickname      = uuid.NewString()
 		validBirthday      = testNowUtc.AddDate(-10, 0, 0)
 		validActiveHabitId = uuid.New()
-		uuidGenerator      = utils.FakeUUIDGenerator{FixedUUID: uuid.NewString()}
+		uuidGenerator      = pkg.FakeUUIDGenerator{FixedUUID: uuid.NewString()}
 	)
 
 	type args struct {

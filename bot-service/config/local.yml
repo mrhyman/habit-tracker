@@ -12,7 +12,7 @@ scrape_interval: 5s
 logger:
   add_source: true
   level: -4 #debug
-kafka:
+eventbus:
   host:
     - localhost:6502
 user_created_event_producer_config:

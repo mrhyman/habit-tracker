@@ -9,7 +9,7 @@ import (
 	_ "main/docs"
 	"main/internal/handler"
 	"main/internal/server/middleware"
-	"main/utils"
+	"main/pkg"
 	"net/http"
 )
 
@@ -31,14 +31,14 @@ func New(port int, h handler.HttpHandler) *Server {
 func (s *Server) Start() {
 	slog.InfoContext(s.Ctx, fmt.Sprintf("Listening on port%s", s.Instance.Addr))
 	if err := s.Instance.ListenAndServe(); err != nil {
-		utils.LogFatal(s.Ctx, "server start error", err)
+		pkg.LogFatal(s.Ctx, "server start error", err)
 	}
 }
 
 func (s *Server) Shutdown() {
 	slog.InfoContext(s.Ctx, "Shutting service down")
 	if err := s.Instance.Shutdown(s.Ctx); err != nil {
-		utils.LogFatal(s.Ctx, "server shutdown error", err)
+		pkg.LogFatal(s.Ctx, "server shutdown error", err)
 	}
 }
 

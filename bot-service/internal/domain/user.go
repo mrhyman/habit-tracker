@@ -2,7 +2,7 @@ package domain
 
 import (
 	"errors"
-	"main/utils"
+	"main/pkg"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,20 +16,20 @@ var (
 
 type User struct {
 	AggregateRoot
-	Id            uuid.UUID
-	Nickname      string
-	CreatedAt     time.Time
-	Birthday      *time.Time
-	ActiveHabitId *uuid.UUID
+	Id             uuid.UUID
+	Nickname       string
+	CreatedAt      time.Time
+	Birthday       *time.Time
+	ActiveHabitIds []uuid.UUID
 }
 
 func NewUser(
-	uuidGenerator utils.UUIDGenerator,
+	uuidGenerator pkg.UUIDGenerator,
 	userID uuid.UUID,
 	userName string,
 	createdAt time.Time,
 	birthday *time.Time,
-	activeHabitId *uuid.UUID,
+	activeHabitIds []uuid.UUID,
 ) (*User, error) {
 	nowUTC := timeNowFn()
 	created := createdAt.UTC()
@@ -46,11 +46,11 @@ func NewUser(
 	}
 
 	user := &User{
-		Id:            userID,
-		Nickname:      userName,
-		CreatedAt:     created.Truncate(time.Microsecond),
-		Birthday:      birthday,
-		ActiveHabitId: activeHabitId,
+		Id:             userID,
+		Nickname:       userName,
+		CreatedAt:      created.Truncate(time.Microsecond),
+		Birthday:       birthday,
+		ActiveHabitIds: activeHabitIds,
 	}
 
 	user.AddEvent(NewUserCreatedEvent(
@@ -60,13 +60,20 @@ func NewUser(
 		user.Nickname,
 		user.CreatedAt,
 		user.Birthday,
-		user.ActiveHabitId,
+		user.ActiveHabitIds,
 	))
 
 	return user, nil
 }
 
 func (u *User) IsAdult() bool {
+	if u.Birthday != nil {
+		return time.Since(*u.Birthday).Hours()/24/365 >= 18
+	}
+	return false
+}
+
+func (u *User) ActivateHabit(id string) bool {
 	if u.Birthday != nil {
 		return time.Since(*u.Birthday).Hours()/24/365 >= 18
 	}

@@ -1,17 +1,15 @@
-package userevent
+package habitactivated
 
 import (
 	"context"
 	"fmt"
-	"log/slog"
-
 	"github.com/IBM/sarama"
 	"github.com/google/uuid"
-
+	"log/slog"
 	"main/internal/domain"
 )
 
-type HabitActivatedMessage struct {
+type Message struct {
 	HabitId uuid.UUID `json:"habit_id"`
 	UserID  uuid.UUID `json:"user_id"`
 }
@@ -24,9 +22,6 @@ func (r Repo) SendHabitActivatedEvent(ctx context.Context, event domain.HabitAct
 	}
 	p, o, err := r.pr.SendMessage(msg)
 	if err != nil {
-		slog.ErrorContext(
-			ctx, "FAILED to send habit_created event", slog.String("err", err.Error()),
-		)
 		return err
 	}
 	slog.InfoContext(

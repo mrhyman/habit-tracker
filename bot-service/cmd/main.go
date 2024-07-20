@@ -2,15 +2,15 @@ package main
 
 import (
 	"context"
+	"main/internal/repo/eventbus/habitactivated"
+	"main/internal/repo/eventbus/usercreated"
 	"main/internal/usecase/activatehabit"
-	"main/utils"
+	"main/pkg"
 	"syscall"
 
+	"github.com/ds248a/closer"
 	"main/internal/eventrouter"
 	"main/internal/repo/database"
-	"main/internal/repo/kafka/userevent"
-
-	"github.com/ds248a/closer"
 
 	"main/internal/config"
 	"main/internal/handler"
@@ -39,20 +39,23 @@ func main() {
 
 	db, err := database.New(ctx, cfg.Database)
 	if err != nil {
-		utils.LogFatal(ctx, "error create db pool", err)
+		pkg.LogFatal(ctx, "error create db pool", err)
 	}
 	closer.Add(db.Close)
 
-	userCreatedEventProducer, err := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.UserCreatedEventProducerConfig)
-	habitActivatedEventProducer, err := userevent.NewRepo(ctx, cfg.Kafka.Host, cfg.HabitActivatedEventProducerConfig)
+	userCreatedEventRepo, err := usercreated.NewRepo(ctx, cfg.Kafka.Host, cfg.UserCreatedEventProducerConfig)
 	if err != nil {
-		utils.LogFatal(ctx, "error create event producer", err)
+		pkg.LogFatal(ctx, "error create user_created producer", err)
+	}
+	habitActivatedEventRepo, err := habitactivated.NewRepo(ctx, cfg.Kafka.Host, cfg.HabitActivatedEventProducerConfig)
+	if err != nil {
+		pkg.LogFatal(ctx, "error create habit_activated producer", err)
 	}
 
-	userRepo := database.NewUserRepository(ctx, db.Pool)
+	userRepo := database.NewRepo(ctx, db.Pool)
 
 	// Event router
-	eventRouter := eventrouter.NewService(userCreatedEventProducer, habitActivatedEventProducer)
+	eventRouter := eventrouter.NewService(userCreatedEventRepo, habitActivatedEventRepo)
 
 	httpHandler := handler.New(
 		createuser.NewCommandHandler(userRepo, eventRouter),
