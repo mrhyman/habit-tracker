@@ -8,7 +8,7 @@ import (
 )
 
 func (qh QueryHandler) Handle(ctx context.Context, q Query) (*domain.User, error) {
-	user, err := qh.userRepo.GetUserByID(q.UserID)
+	user, err := qh.userRepo.GetUserByID(ctx, q.UserID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.ErrUserNotFound

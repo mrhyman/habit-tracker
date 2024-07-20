@@ -22,7 +22,12 @@ func (s *Service) routeEvent(ctx context.Context, event domain.Event) error {
 	case *domain.UserCreatedEvent:
 		return s.userCreatedEventRepo.SendUserCreatedEvent(ctx, *ev)
 	case *domain.HabitActivatedEvent:
-		return s.habitActivatedEventRepo.SendHabitActivatedEvent(ctx, *ev)
+		if err := s.userUpdatedEventRepo.SendUserUpdatedEvent(ctx, domain.UserUpdatedEvent{UserID: ev.UserID}); err != nil {
+			return err
+		}
+		if err := s.habitActivatedEventRepo.SendHabitActivatedEvent(ctx, *ev); err != nil {
+			return err
+		}
 	default:
 		fmt.Println(ev)
 	}

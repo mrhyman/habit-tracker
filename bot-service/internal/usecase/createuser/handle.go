@@ -9,7 +9,7 @@ import (
 )
 
 func (ch CommandHandler) Handle(ctx context.Context, cmd Command) error {
-	user, err := ch.userRepo.GetUserByID(cmd.UserId)
+	user, err := ch.userRepo.GetUserByID(ctx, cmd.UserId)
 	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return err
 	}
@@ -28,7 +28,7 @@ func (ch CommandHandler) Handle(ctx context.Context, cmd Command) error {
 	if err != nil {
 		return err
 	}
-	if err = ch.userRepo.CreateUser(user); err != nil {
+	if err = ch.userRepo.CreateUser(ctx, user); err != nil {
 		return err
 	}
 

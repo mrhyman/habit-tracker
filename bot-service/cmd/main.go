@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"main/internal/repo/database/event"
+	"main/internal/repo/database/user"
 	"main/internal/repo/eventbus/habitactivated"
 	"main/internal/repo/eventbus/usercreated"
+	"main/internal/repo/eventbus/userupdated"
 	"main/internal/usecase/activatehabit"
 	"main/pkg"
 	"syscall"
@@ -47,20 +50,25 @@ func main() {
 	if err != nil {
 		pkg.LogFatal(ctx, "error create user_created producer", err)
 	}
+	userUpdatedEventRepo, err := userupdated.NewRepo(ctx, cfg.Kafka.Host, cfg.UserUpdatedEventProducerConfig)
+	if err != nil {
+		pkg.LogFatal(ctx, "error create user_updated producer", err)
+	}
 	habitActivatedEventRepo, err := habitactivated.NewRepo(ctx, cfg.Kafka.Host, cfg.HabitActivatedEventProducerConfig)
 	if err != nil {
 		pkg.LogFatal(ctx, "error create habit_activated producer", err)
 	}
 
-	userRepo := database.NewRepo(ctx, db.Pool)
+	userRepo := user.NewRepo(db.Pool)
+	eventRepo := event.NewRepo(db.Pool)
 
 	// Event router
-	eventRouter := eventrouter.NewService(userCreatedEventRepo, habitActivatedEventRepo)
+	eventRouter := eventrouter.NewService(userCreatedEventRepo, userUpdatedEventRepo, habitActivatedEventRepo)
 
 	httpHandler := handler.New(
 		createuser.NewCommandHandler(userRepo, eventRouter),
 		getuserbyid.NewQueryHandler(userRepo),
-		activatehabit.NewCommandHandler(userRepo, eventRouter),
+		activatehabit.NewCommandHandler(userRepo, eventRepo, eventRouter),
 	)
 
 	go metrics.RecordMetrics(userRepo, cfg.BusinessMetricsScrapeInterval)

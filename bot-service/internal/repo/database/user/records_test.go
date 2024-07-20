@@ -1,4 +1,4 @@
-package database
+package user
 
 import (
 	"github.com/google/uuid"
@@ -17,6 +17,6 @@ func TestRecordFromDomain(t *testing.T) {
 		user := domain.User{Id: uuid.New(), Nickname: uuid.New().String(), CreatedAt: time.Now().UTC()}
 
 		record := userFromDomain(&user)
-		require.Equal(t, record, UserRecord{Id: user.Id, Nickname: user.Nickname, CreatedAt: user.CreatedAt})
+		require.Equal(t, record, Record{Id: user.Id, Nickname: user.Nickname, CreatedAt: user.CreatedAt})
 	})
 }

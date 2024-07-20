@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus"
 	"log/slog"
-	"main/internal/repo/database"
+	"main/internal/repo/database/user"
 	"time"
 )
 
@@ -15,7 +15,7 @@ var (
 	}))
 )
 
-func RecordMetrics(repo *database.UserRepo, interval time.Duration) {
+func RecordMetrics(repo *user.Repo, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 

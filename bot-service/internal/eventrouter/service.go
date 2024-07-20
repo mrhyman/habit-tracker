@@ -11,6 +11,10 @@ type iUserCreatedEventRepo interface {
 	SendUserCreatedEvent(ctx context.Context, event domain.UserCreatedEvent) error
 }
 
+type iUserUpdatedEventRepo interface {
+	SendUserUpdatedEvent(ctx context.Context, event domain.UserUpdatedEvent) error
+}
+
 type iHabitActivatedEventRepo interface {
 	SendHabitActivatedEvent(ctx context.Context, event domain.HabitActivatedEvent) error
 }
@@ -18,13 +22,18 @@ type iHabitActivatedEventRepo interface {
 // Service сервис маршрутизации доменных событий.
 type Service struct {
 	userCreatedEventRepo    iUserCreatedEventRepo
+	userUpdatedEventRepo    iUserUpdatedEventRepo
 	habitActivatedEventRepo iHabitActivatedEventRepo
 }
 
 // NewService возвращает новый Service.
-func NewService(userEvenRepo iUserCreatedEventRepo, habitActivatedEventRepo iHabitActivatedEventRepo) *Service {
+func NewService(
+	userCreatedEventRepo iUserCreatedEventRepo,
+	userUpdatedEventRepo iUserUpdatedEventRepo,
+	habitActivatedEventRepo iHabitActivatedEventRepo) *Service {
 	return &Service{
-		userCreatedEventRepo:    userEvenRepo,
+		userCreatedEventRepo:    userCreatedEventRepo,
+		userUpdatedEventRepo:    userUpdatedEventRepo,
 		habitActivatedEventRepo: habitActivatedEventRepo,
 	}
 }

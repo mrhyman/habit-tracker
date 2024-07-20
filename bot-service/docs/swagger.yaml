@@ -1,0 +1,143 @@
+definitions:
+  handler.HabitActivationModel:
+    properties:
+      active_habit_id:
+        format: uuid
+        type: string
+      user_id:
+        format: uuid
+        type: string
+    type: object
+  handler.UserModel:
+    properties:
+      active_habit_ids:
+        items:
+          format: uuid[]
+          type: string
+        type: array
+      birthday:
+        format: datetime
+        type: string
+      createdAt:
+        format: datetime
+        type: string
+      id:
+        format: uuid
+        type: string
+      nickname:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Habit Tracker Bot
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Ping
+      tags:
+      - handler
+  /user/activateHabit:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: HabitActivationRequest
+        in: body
+        name: habitActivation
+        required: true
+        schema:
+          $ref: '#/definitions/handler.HabitActivationModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Activate user habit
+      tags:
+      - handler
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: CreateUserRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UserModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "409":
+          description: Conflict
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create bot user
+      tags:
+      - handler
+  /user/search:
+    get:
+      parameters:
+      - description: uuid formatted ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get bot user
+      tags:
+      - handler
+swagger: "2.0"

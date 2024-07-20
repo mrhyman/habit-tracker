@@ -1,4 +1,4 @@
-package database
+package user
 
 import (
 	"github.com/google/uuid"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type UserRecord struct {
+type Record struct {
 	Id             uuid.UUID   `db:"id"`
 	Nickname       string      `db:"nickname"`
 	CreatedAt      time.Time   `db:"created_at"`
@@ -14,8 +14,8 @@ type UserRecord struct {
 	ActiveHabitIds []uuid.UUID `db:"active_habit_ids"`
 }
 
-func userFromDomain(user *domain.User) UserRecord {
-	return UserRecord{
+func userFromDomain(user *domain.User) Record {
+	return Record{
 		Id:             user.Id,
 		Nickname:       user.Nickname,
 		CreatedAt:      user.CreatedAt,

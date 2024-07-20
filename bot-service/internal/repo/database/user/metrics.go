@@ -1,4 +1,4 @@
-package database
+package user
 
 import (
 	"context"
@@ -9,7 +9,7 @@ var (
 	AdultAge = 18
 )
 
-func (r *UserRepo) AdultUserMetric() (int, error) {
+func (r *Repo) AdultUserMetric() (int, error) {
 	var adultCount int
 	query := `SELECT COUNT(*) FROM users WHERE EXTRACT(YEAR FROM AGE(CURRENT_DATE, birthday)) >= @age`
 	args := pgx.NamedArgs{

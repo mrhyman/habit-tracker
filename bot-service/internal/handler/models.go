@@ -11,7 +11,7 @@ type UserModel struct {
 	Nickname       string      `json:"nickname"`
 	CreatedAt      time.Time   `json:"createdAt" format:"datetime"`
 	Birthday       *time.Time  `json:"birthday" format:"datetime"`
-	ActiveHabitIds []uuid.UUID `json:"active_habit_ids"`
+	ActiveHabitIds []uuid.UUID `json:"active_habit_ids" format:"uuid[]"`
 }
 
 type HabitActivationModel struct {

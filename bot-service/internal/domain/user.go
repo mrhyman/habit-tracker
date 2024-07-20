@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	ErrInvalidUserID     = errors.New("user ID should be a valid UUID")
-	ErrInvalidUserName   = errors.New("user name should not be empty")
-	ErrUserAlreadyExists = errors.New("user with such id already exists")
+	ErrInvalidUserID         = errors.New("user ID should be a valid UUID")
+	ErrInvalidUserName       = errors.New("user name should not be empty")
+	ErrUserAlreadyExists     = errors.New("user with such id already exists")
+	ErrHabitAlreadyActivated = errors.New("habit already activated")
 )
 
 type User struct {
@@ -73,9 +74,21 @@ func (u *User) IsAdult() bool {
 	return false
 }
 
-func (u *User) ActivateHabit(id string) bool {
-	if u.Birthday != nil {
-		return time.Since(*u.Birthday).Hours()/24/365 >= 18
+func (u *User) ActivateHabit(id uuid.UUID) (*User, error) {
+	for _, habitId := range u.ActiveHabitIds {
+		if habitId == id {
+			return nil, ErrHabitAlreadyActivated
+		}
 	}
-	return false
+
+	h := append(u.ActiveHabitIds, id)
+	u.ActiveHabitIds = h
+	u.AddEvent(NewHabitActivatedEvent(
+		uuid.NewString(),
+		time.Now().UTC(),
+		u.Id,
+		id,
+	))
+
+	return u, nil
 }

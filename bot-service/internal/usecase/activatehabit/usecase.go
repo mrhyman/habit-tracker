@@ -10,8 +10,12 @@ import (
 )
 
 type iUserRepo interface {
-	GetUserByID(userID uuid.UUID) (*domain.User, error)
-	ActivateHabit(userID uuid.UUID, habitID uuid.UUID) error
+	GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error)
+	ActivateHabit(ctx context.Context, userID uuid.UUID, habitID uuid.UUID) error
+}
+
+type iEventRepo interface {
+	CreateEvent(ctx context.Context, ev *domain.Event) error
 }
 
 type iEventRouter interface {
@@ -20,9 +24,10 @@ type iEventRouter interface {
 
 type CommandHandler struct {
 	userRepo    iUserRepo
+	eventRepo   iEventRepo
 	eventRouter iEventRouter
 }
 
-func NewCommandHandler(userRepo iUserRepo, eventRouter iEventRouter) *CommandHandler {
-	return &CommandHandler{userRepo: userRepo, eventRouter: eventRouter}
+func NewCommandHandler(userRepo iUserRepo, eventRepo iEventRepo, eventRouter iEventRouter) *CommandHandler {
+	return &CommandHandler{userRepo: userRepo, eventRepo: eventRepo, eventRouter: eventRouter}
 }

@@ -51,6 +51,11 @@ type UserCreatedEvent struct {
 	ActiveHabitIds []uuid.UUID
 }
 
+type UserUpdatedEvent struct {
+	EventBase
+	UserID uuid.UUID
+}
+
 type HabitActivatedEvent struct {
 	EventBase
 	UserID  uuid.UUID

@@ -10,7 +10,6 @@ var (
 )
 
 type Habit struct {
-	AggregateRoot
 	Id     uuid.UUID
 	UserId uuid.UUID
 }

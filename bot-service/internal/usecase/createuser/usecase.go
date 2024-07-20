@@ -10,8 +10,8 @@ import (
 )
 
 type iUserRepo interface {
-	CreateUser(user *domain.User) error
-	GetUserByID(userID uuid.UUID) (*domain.User, error)
+	CreateUser(ctx context.Context, user *domain.User) error
+	GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error)
 }
 
 type iEventRouter interface {

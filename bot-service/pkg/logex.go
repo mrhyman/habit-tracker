@@ -10,3 +10,8 @@ func LogFatal(ctx context.Context, message string, err error) {
 	slog.ErrorContext(ctx, message, slog.String("err", err.Error()))
 	os.Exit(1)
 }
+
+func LogHttpError(ctx context.Context, message string, err error) {
+	slog.ErrorContext(ctx, message, slog.String("err", err.Error()))
+	os.Exit(1)
+}

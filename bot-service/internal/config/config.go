@@ -12,5 +12,6 @@ type Config struct {
 	Logger                            LoggerConfig   `mapstructure:"pkg"`
 	Kafka                             KafkaConfig    `mapstructure:"eventbus"`
 	UserCreatedEventProducerConfig    ProducerConfig `mapstructure:"user_created_event_producer_config"`
+	UserUpdatedEventProducerConfig    ProducerConfig `mapstructure:"user_updated_event_producer_config"`
 	HabitActivatedEventProducerConfig ProducerConfig `mapstructure:"habit_activated_event_producer_config"`
 }
