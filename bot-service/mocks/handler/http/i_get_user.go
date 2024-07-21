@@ -3,6 +3,7 @@
 package http
 
 import (
+	"context"
 	"main/internal/domain"
 	"main/internal/usecase/getuserbyid"
 	"sync"
@@ -17,8 +18,8 @@ type IGetUserMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
 
-	funcHandle          func(q getuserbyid.Query) (up1 *domain.User, err error)
-	inspectFuncHandle   func(q getuserbyid.Query)
+	funcHandle          func(ctx context.Context, q getuserbyid.Query) (up1 *domain.User, err error)
+	inspectFuncHandle   func(ctx context.Context, q getuserbyid.Query)
 	afterHandleCounter  uint64
 	beforeHandleCounter uint64
 	HandleMock          mIGetUserMockHandle
@@ -63,12 +64,14 @@ type IGetUserMockHandleExpectation struct {
 
 // IGetUserMockHandleParams contains parameters of the iGetUser.Handle
 type IGetUserMockHandleParams struct {
-	q getuserbyid.Query
+	ctx context.Context
+	q   getuserbyid.Query
 }
 
 // IGetUserMockHandleParamPtrs contains pointers to parameters of the iGetUser.Handle
 type IGetUserMockHandleParamPtrs struct {
-	q *getuserbyid.Query
+	ctx *context.Context
+	q   *getuserbyid.Query
 }
 
 // IGetUserMockHandleResults contains results of the iGetUser.Handle
@@ -88,7 +91,7 @@ func (mmHandle *mIGetUserMockHandle) Optional() *mIGetUserMockHandle {
 }
 
 // Expect sets up expected params for iGetUser.Handle
-func (mmHandle *mIGetUserMockHandle) Expect(q getuserbyid.Query) *mIGetUserMockHandle {
+func (mmHandle *mIGetUserMockHandle) Expect(ctx context.Context, q getuserbyid.Query) *mIGetUserMockHandle {
 	if mmHandle.mock.funcHandle != nil {
 		mmHandle.mock.t.Fatalf("IGetUserMock.Handle mock is already set by Set")
 	}
@@ -101,7 +104,7 @@ func (mmHandle *mIGetUserMockHandle) Expect(q getuserbyid.Query) *mIGetUserMockH
 		mmHandle.mock.t.Fatalf("IGetUserMock.Handle mock is already set by ExpectParams functions")
 	}
 
-	mmHandle.defaultExpectation.params = &IGetUserMockHandleParams{q}
+	mmHandle.defaultExpectation.params = &IGetUserMockHandleParams{ctx, q}
 	for _, e := range mmHandle.expectations {
 		if minimock.Equal(e.params, mmHandle.defaultExpectation.params) {
 			mmHandle.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmHandle.defaultExpectation.params)
@@ -111,8 +114,30 @@ func (mmHandle *mIGetUserMockHandle) Expect(q getuserbyid.Query) *mIGetUserMockH
 	return mmHandle
 }
 
-// ExpectQParam1 sets up expected param q for iGetUser.Handle
-func (mmHandle *mIGetUserMockHandle) ExpectQParam1(q getuserbyid.Query) *mIGetUserMockHandle {
+// ExpectCtxParam1 sets up expected param ctx for iGetUser.Handle
+func (mmHandle *mIGetUserMockHandle) ExpectCtxParam1(ctx context.Context) *mIGetUserMockHandle {
+	if mmHandle.mock.funcHandle != nil {
+		mmHandle.mock.t.Fatalf("IGetUserMock.Handle mock is already set by Set")
+	}
+
+	if mmHandle.defaultExpectation == nil {
+		mmHandle.defaultExpectation = &IGetUserMockHandleExpectation{}
+	}
+
+	if mmHandle.defaultExpectation.params != nil {
+		mmHandle.mock.t.Fatalf("IGetUserMock.Handle mock is already set by Expect")
+	}
+
+	if mmHandle.defaultExpectation.paramPtrs == nil {
+		mmHandle.defaultExpectation.paramPtrs = &IGetUserMockHandleParamPtrs{}
+	}
+	mmHandle.defaultExpectation.paramPtrs.ctx = &ctx
+
+	return mmHandle
+}
+
+// ExpectQParam2 sets up expected param q for iGetUser.Handle
+func (mmHandle *mIGetUserMockHandle) ExpectQParam2(q getuserbyid.Query) *mIGetUserMockHandle {
 	if mmHandle.mock.funcHandle != nil {
 		mmHandle.mock.t.Fatalf("IGetUserMock.Handle mock is already set by Set")
 	}
@@ -134,7 +159,7 @@ func (mmHandle *mIGetUserMockHandle) ExpectQParam1(q getuserbyid.Query) *mIGetUs
 }
 
 // Inspect accepts an inspector function that has same arguments as the iGetUser.Handle
-func (mmHandle *mIGetUserMockHandle) Inspect(f func(q getuserbyid.Query)) *mIGetUserMockHandle {
+func (mmHandle *mIGetUserMockHandle) Inspect(f func(ctx context.Context, q getuserbyid.Query)) *mIGetUserMockHandle {
 	if mmHandle.mock.inspectFuncHandle != nil {
 		mmHandle.mock.t.Fatalf("Inspect function is already set for IGetUserMock.Handle")
 	}
@@ -158,7 +183,7 @@ func (mmHandle *mIGetUserMockHandle) Return(up1 *domain.User, err error) *IGetUs
 }
 
 // Set uses given function f to mock the iGetUser.Handle method
-func (mmHandle *mIGetUserMockHandle) Set(f func(q getuserbyid.Query) (up1 *domain.User, err error)) *IGetUserMock {
+func (mmHandle *mIGetUserMockHandle) Set(f func(ctx context.Context, q getuserbyid.Query) (up1 *domain.User, err error)) *IGetUserMock {
 	if mmHandle.defaultExpectation != nil {
 		mmHandle.mock.t.Fatalf("Default expectation is already set for the iGetUser.Handle method")
 	}
@@ -173,14 +198,14 @@ func (mmHandle *mIGetUserMockHandle) Set(f func(q getuserbyid.Query) (up1 *domai
 
 // When sets expectation for the iGetUser.Handle which will trigger the result defined by the following
 // Then helper
-func (mmHandle *mIGetUserMockHandle) When(q getuserbyid.Query) *IGetUserMockHandleExpectation {
+func (mmHandle *mIGetUserMockHandle) When(ctx context.Context, q getuserbyid.Query) *IGetUserMockHandleExpectation {
 	if mmHandle.mock.funcHandle != nil {
 		mmHandle.mock.t.Fatalf("IGetUserMock.Handle mock is already set by Set")
 	}
 
 	expectation := &IGetUserMockHandleExpectation{
 		mock:   mmHandle.mock,
-		params: &IGetUserMockHandleParams{q},
+		params: &IGetUserMockHandleParams{ctx, q},
 	}
 	mmHandle.expectations = append(mmHandle.expectations, expectation)
 	return expectation
@@ -213,15 +238,15 @@ func (mmHandle *mIGetUserMockHandle) invocationsDone() bool {
 }
 
 // Handle implements handler.iGetUser
-func (mmHandle *IGetUserMock) Handle(q getuserbyid.Query) (up1 *domain.User, err error) {
+func (mmHandle *IGetUserMock) Handle(ctx context.Context, q getuserbyid.Query) (up1 *domain.User, err error) {
 	mm_atomic.AddUint64(&mmHandle.beforeHandleCounter, 1)
 	defer mm_atomic.AddUint64(&mmHandle.afterHandleCounter, 1)
 
 	if mmHandle.inspectFuncHandle != nil {
-		mmHandle.inspectFuncHandle(q)
+		mmHandle.inspectFuncHandle(ctx, q)
 	}
 
-	mm_params := IGetUserMockHandleParams{q}
+	mm_params := IGetUserMockHandleParams{ctx, q}
 
 	// Record call args
 	mmHandle.HandleMock.mutex.Lock()
@@ -240,9 +265,13 @@ func (mmHandle *IGetUserMock) Handle(q getuserbyid.Query) (up1 *domain.User, err
 		mm_want := mmHandle.HandleMock.defaultExpectation.params
 		mm_want_ptrs := mmHandle.HandleMock.defaultExpectation.paramPtrs
 
-		mm_got := IGetUserMockHandleParams{q}
+		mm_got := IGetUserMockHandleParams{ctx, q}
 
 		if mm_want_ptrs != nil {
+
+			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
+				mmHandle.t.Errorf("IGetUserMock.Handle got unexpected parameter ctx, want: %#v, got: %#v%s\n", *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+			}
 
 			if mm_want_ptrs.q != nil && !minimock.Equal(*mm_want_ptrs.q, mm_got.q) {
 				mmHandle.t.Errorf("IGetUserMock.Handle got unexpected parameter q, want: %#v, got: %#v%s\n", *mm_want_ptrs.q, mm_got.q, minimock.Diff(*mm_want_ptrs.q, mm_got.q))
@@ -259,9 +288,9 @@ func (mmHandle *IGetUserMock) Handle(q getuserbyid.Query) (up1 *domain.User, err
 		return (*mm_results).up1, (*mm_results).err
 	}
 	if mmHandle.funcHandle != nil {
-		return mmHandle.funcHandle(q)
+		return mmHandle.funcHandle(ctx, q)
 	}
-	mmHandle.t.Fatalf("Unexpected call to IGetUserMock.Handle. %v", q)
+	mmHandle.t.Fatalf("Unexpected call to IGetUserMock.Handle. %v %v", ctx, q)
 	return
 }
 

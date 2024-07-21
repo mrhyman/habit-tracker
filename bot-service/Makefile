@@ -28,7 +28,7 @@ up:
 
 .PHONY: infra
 infra:
-	docker compose -f docker-compose.yml --project-name bot up -d postgres pgbouncer --build
+	docker compose -f docker-compose.yml --project-name bot up -d postgres pgbouncer kafka kafka-ui --build
 
 .PHONY: down
 down:
@@ -54,3 +54,8 @@ generate:
 .PHONY: test
 test:
 	go test -cover -v ./...
+
+.PHONY: docs
+docs:
+	swag init -g cmd/main.go
+	swag fmt

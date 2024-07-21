@@ -3,6 +3,7 @@
 package http
 
 import (
+	"context"
 	"main/internal/usecase/createuser"
 	"sync"
 	mm_atomic "sync/atomic"
@@ -16,8 +17,8 @@ type ICreateUserMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
 
-	funcHandle          func(cmd createuser.Command) (err error)
-	inspectFuncHandle   func(cmd createuser.Command)
+	funcHandle          func(ctx context.Context, cmd createuser.Command) (err error)
+	inspectFuncHandle   func(ctx context.Context, cmd createuser.Command)
 	afterHandleCounter  uint64
 	beforeHandleCounter uint64
 	HandleMock          mICreateUserMockHandle
@@ -62,11 +63,13 @@ type ICreateUserMockHandleExpectation struct {
 
 // ICreateUserMockHandleParams contains parameters of the iCreateUser.Handle
 type ICreateUserMockHandleParams struct {
+	ctx context.Context
 	cmd createuser.Command
 }
 
 // ICreateUserMockHandleParamPtrs contains pointers to parameters of the iCreateUser.Handle
 type ICreateUserMockHandleParamPtrs struct {
+	ctx *context.Context
 	cmd *createuser.Command
 }
 
@@ -86,7 +89,7 @@ func (mmHandle *mICreateUserMockHandle) Optional() *mICreateUserMockHandle {
 }
 
 // Expect sets up expected params for iCreateUser.Handle
-func (mmHandle *mICreateUserMockHandle) Expect(cmd createuser.Command) *mICreateUserMockHandle {
+func (mmHandle *mICreateUserMockHandle) Expect(ctx context.Context, cmd createuser.Command) *mICreateUserMockHandle {
 	if mmHandle.mock.funcHandle != nil {
 		mmHandle.mock.t.Fatalf("ICreateUserMock.Handle mock is already set by Set")
 	}
@@ -99,7 +102,7 @@ func (mmHandle *mICreateUserMockHandle) Expect(cmd createuser.Command) *mICreate
 		mmHandle.mock.t.Fatalf("ICreateUserMock.Handle mock is already set by ExpectParams functions")
 	}
 
-	mmHandle.defaultExpectation.params = &ICreateUserMockHandleParams{cmd}
+	mmHandle.defaultExpectation.params = &ICreateUserMockHandleParams{ctx, cmd}
 	for _, e := range mmHandle.expectations {
 		if minimock.Equal(e.params, mmHandle.defaultExpectation.params) {
 			mmHandle.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmHandle.defaultExpectation.params)
@@ -109,8 +112,30 @@ func (mmHandle *mICreateUserMockHandle) Expect(cmd createuser.Command) *mICreate
 	return mmHandle
 }
 
-// ExpectCmdParam1 sets up expected param cmd for iCreateUser.Handle
-func (mmHandle *mICreateUserMockHandle) ExpectCmdParam1(cmd createuser.Command) *mICreateUserMockHandle {
+// ExpectCtxParam1 sets up expected param ctx for iCreateUser.Handle
+func (mmHandle *mICreateUserMockHandle) ExpectCtxParam1(ctx context.Context) *mICreateUserMockHandle {
+	if mmHandle.mock.funcHandle != nil {
+		mmHandle.mock.t.Fatalf("ICreateUserMock.Handle mock is already set by Set")
+	}
+
+	if mmHandle.defaultExpectation == nil {
+		mmHandle.defaultExpectation = &ICreateUserMockHandleExpectation{}
+	}
+
+	if mmHandle.defaultExpectation.params != nil {
+		mmHandle.mock.t.Fatalf("ICreateUserMock.Handle mock is already set by Expect")
+	}
+
+	if mmHandle.defaultExpectation.paramPtrs == nil {
+		mmHandle.defaultExpectation.paramPtrs = &ICreateUserMockHandleParamPtrs{}
+	}
+	mmHandle.defaultExpectation.paramPtrs.ctx = &ctx
+
+	return mmHandle
+}
+
+// ExpectCmdParam2 sets up expected param cmd for iCreateUser.Handle
+func (mmHandle *mICreateUserMockHandle) ExpectCmdParam2(cmd createuser.Command) *mICreateUserMockHandle {
 	if mmHandle.mock.funcHandle != nil {
 		mmHandle.mock.t.Fatalf("ICreateUserMock.Handle mock is already set by Set")
 	}
@@ -132,7 +157,7 @@ func (mmHandle *mICreateUserMockHandle) ExpectCmdParam1(cmd createuser.Command) 
 }
 
 // Inspect accepts an inspector function that has same arguments as the iCreateUser.Handle
-func (mmHandle *mICreateUserMockHandle) Inspect(f func(cmd createuser.Command)) *mICreateUserMockHandle {
+func (mmHandle *mICreateUserMockHandle) Inspect(f func(ctx context.Context, cmd createuser.Command)) *mICreateUserMockHandle {
 	if mmHandle.mock.inspectFuncHandle != nil {
 		mmHandle.mock.t.Fatalf("Inspect function is already set for ICreateUserMock.Handle")
 	}
@@ -156,7 +181,7 @@ func (mmHandle *mICreateUserMockHandle) Return(err error) *ICreateUserMock {
 }
 
 // Set uses given function f to mock the iCreateUser.Handle method
-func (mmHandle *mICreateUserMockHandle) Set(f func(cmd createuser.Command) (err error)) *ICreateUserMock {
+func (mmHandle *mICreateUserMockHandle) Set(f func(ctx context.Context, cmd createuser.Command) (err error)) *ICreateUserMock {
 	if mmHandle.defaultExpectation != nil {
 		mmHandle.mock.t.Fatalf("Default expectation is already set for the iCreateUser.Handle method")
 	}
@@ -171,14 +196,14 @@ func (mmHandle *mICreateUserMockHandle) Set(f func(cmd createuser.Command) (err 
 
 // When sets expectation for the iCreateUser.Handle which will trigger the result defined by the following
 // Then helper
-func (mmHandle *mICreateUserMockHandle) When(cmd createuser.Command) *ICreateUserMockHandleExpectation {
+func (mmHandle *mICreateUserMockHandle) When(ctx context.Context, cmd createuser.Command) *ICreateUserMockHandleExpectation {
 	if mmHandle.mock.funcHandle != nil {
 		mmHandle.mock.t.Fatalf("ICreateUserMock.Handle mock is already set by Set")
 	}
 
 	expectation := &ICreateUserMockHandleExpectation{
 		mock:   mmHandle.mock,
-		params: &ICreateUserMockHandleParams{cmd},
+		params: &ICreateUserMockHandleParams{ctx, cmd},
 	}
 	mmHandle.expectations = append(mmHandle.expectations, expectation)
 	return expectation
@@ -211,15 +236,15 @@ func (mmHandle *mICreateUserMockHandle) invocationsDone() bool {
 }
 
 // Handle implements handler.iCreateUser
-func (mmHandle *ICreateUserMock) Handle(cmd createuser.Command) (err error) {
+func (mmHandle *ICreateUserMock) Handle(ctx context.Context, cmd createuser.Command) (err error) {
 	mm_atomic.AddUint64(&mmHandle.beforeHandleCounter, 1)
 	defer mm_atomic.AddUint64(&mmHandle.afterHandleCounter, 1)
 
 	if mmHandle.inspectFuncHandle != nil {
-		mmHandle.inspectFuncHandle(cmd)
+		mmHandle.inspectFuncHandle(ctx, cmd)
 	}
 
-	mm_params := ICreateUserMockHandleParams{cmd}
+	mm_params := ICreateUserMockHandleParams{ctx, cmd}
 
 	// Record call args
 	mmHandle.HandleMock.mutex.Lock()
@@ -238,9 +263,13 @@ func (mmHandle *ICreateUserMock) Handle(cmd createuser.Command) (err error) {
 		mm_want := mmHandle.HandleMock.defaultExpectation.params
 		mm_want_ptrs := mmHandle.HandleMock.defaultExpectation.paramPtrs
 
-		mm_got := ICreateUserMockHandleParams{cmd}
+		mm_got := ICreateUserMockHandleParams{ctx, cmd}
 
 		if mm_want_ptrs != nil {
+
+			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
+				mmHandle.t.Errorf("ICreateUserMock.Handle got unexpected parameter ctx, want: %#v, got: %#v%s\n", *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+			}
 
 			if mm_want_ptrs.cmd != nil && !minimock.Equal(*mm_want_ptrs.cmd, mm_got.cmd) {
 				mmHandle.t.Errorf("ICreateUserMock.Handle got unexpected parameter cmd, want: %#v, got: %#v%s\n", *mm_want_ptrs.cmd, mm_got.cmd, minimock.Diff(*mm_want_ptrs.cmd, mm_got.cmd))
@@ -257,9 +286,9 @@ func (mmHandle *ICreateUserMock) Handle(cmd createuser.Command) (err error) {
 		return (*mm_results).err
 	}
 	if mmHandle.funcHandle != nil {
-		return mmHandle.funcHandle(cmd)
+		return mmHandle.funcHandle(ctx, cmd)
 	}
-	mmHandle.t.Fatalf("Unexpected call to ICreateUserMock.Handle. %v", cmd)
+	mmHandle.t.Fatalf("Unexpected call to ICreateUserMock.Handle. %v %v", ctx, cmd)
 	return
 }
 

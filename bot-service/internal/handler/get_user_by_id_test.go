@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -22,6 +23,7 @@ func TestHttpHandler_GetUserById(t *testing.T) {
 		query     = getuserbyid.Query{UserID: userId}
 		body, _   = json.Marshal(UserFromDomain(&validUser))
 		someError = fmt.Errorf("some error")
+		ctx       = context.Background()
 	)
 
 	type args struct {
@@ -48,7 +50,7 @@ func TestHttpHandler_GetUserById(t *testing.T) {
 				}
 			},
 			setMocks: func(m mocks) {
-				m.getUserByIdMock.HandleMock.When(query).Then(&validUser, nil)
+				m.getUserByIdMock.HandleMock.When(ctx, query).Then(&validUser, nil)
 			},
 			wantCode: http.StatusOK,
 			wantBody: string(body),
@@ -82,7 +84,7 @@ func TestHttpHandler_GetUserById(t *testing.T) {
 				}
 			},
 			setMocks: func(m mocks) {
-				m.getUserByIdMock.HandleMock.When(query).Then(nil, domain.ErrUserNotFound)
+				m.getUserByIdMock.HandleMock.When(ctx, query).Then(nil, domain.ErrUserNotFound)
 			},
 			wantCode: http.StatusNotFound,
 			wantBody: fmt.Sprintf("%s\n", domain.ErrUserNotFound.Error()),
@@ -100,7 +102,7 @@ func TestHttpHandler_GetUserById(t *testing.T) {
 				}
 			},
 			setMocks: func(m mocks) {
-				m.getUserByIdMock.HandleMock.When(query).Then(nil, someError)
+				m.getUserByIdMock.HandleMock.When(ctx, query).Then(nil, someError)
 			},
 			wantCode: http.StatusInternalServerError,
 			wantBody: fmt.Sprintf("%s\n", someError.Error()),

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"main/pkg"
 	"os"
 
 	"github.com/spf13/viper"
@@ -21,23 +22,21 @@ func MustLoad() *Config {
 	configFilePath := getConfigPath(ctx)
 	viper.SetConfigFile(configFilePath)
 	if err := viper.ReadInConfig(); err != nil {
-		slog.ErrorContext(
+		pkg.LogFatal(
 			ctx,
 			fmt.Sprintf("Can't read config file %s", configFilePath),
-			slog.String("err", err.Error()),
+			err,
 		)
-		os.Exit(1)
 	}
 
 	config := &Config{}
 
 	if err := viper.Unmarshal(config); err != nil {
-		slog.ErrorContext(
+		pkg.LogFatal(
 			ctx,
 			fmt.Sprintf("Can't parse config file %s", configFilePath),
-			slog.String("err", err.Error()),
+			err,
 		)
-		os.Exit(1)
 	}
 
 	return config

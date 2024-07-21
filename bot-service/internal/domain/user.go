@@ -2,27 +2,37 @@ package domain
 
 import (
 	"errors"
-	"github.com/google/uuid"
+	"main/pkg"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var (
-	ErrInvalidUserID     = errors.New("user ID should be a valid UUID")
-	ErrInvalidUserName   = errors.New("user name should not be empty")
-	ErrUserAlreadyExists = errors.New("user with such id already exists")
+	ErrInvalidUserID         = errors.New("user ID should be a valid UUID")
+	ErrInvalidUserName       = errors.New("user name should not be empty")
+	ErrUserAlreadyExists     = errors.New("user with such id already exists")
+	ErrHabitAlreadyActivated = errors.New("habit already activated")
 )
 
 type User struct {
-	Id            uuid.UUID
-	Nickname      string
-	CreatedAt     time.Time
-	Birthday      *time.Time
-	ActiveHabitId *uuid.UUID
+	AggregateRoot
+	Id             uuid.UUID
+	Nickname       string
+	CreatedAt      time.Time
+	Birthday       *time.Time
+	ActiveHabitIds []uuid.UUID
 }
 
 func NewUser(
-	userID uuid.UUID, userName string, createdAt time.Time, birthday *time.Time, activeHabitId *uuid.UUID,
+	uuidGenerator pkg.UUIDGenerator,
+	userID uuid.UUID,
+	userName string,
+	createdAt time.Time,
+	birthday *time.Time,
+	activeHabitIds []uuid.UUID,
 ) (*User, error) {
+	nowUTC := timeNowFn()
 	created := createdAt.UTC()
 	if uuid.Nil == userID {
 		return nil, ErrInvalidUserID
@@ -33,16 +43,26 @@ func NewUser(
 	}
 
 	if time.Time.IsZero(created) {
-		created = timeNowFn()
+		created = nowUTC
 	}
 
 	user := &User{
-		Id:            userID,
-		Nickname:      userName,
-		CreatedAt:     created.Truncate(time.Microsecond),
-		Birthday:      birthday,
-		ActiveHabitId: activeHabitId,
+		Id:             userID,
+		Nickname:       userName,
+		CreatedAt:      created.Truncate(time.Microsecond),
+		Birthday:       birthday,
+		ActiveHabitIds: activeHabitIds,
 	}
+
+	user.AddEvent(NewUserCreatedEvent(
+		uuidGenerator.NewString(),
+		nowUTC,
+		user.Id,
+		user.Nickname,
+		user.CreatedAt,
+		user.Birthday,
+		user.ActiveHabitIds,
+	))
 
 	return user, nil
 }
@@ -52,4 +72,23 @@ func (u *User) IsAdult() bool {
 		return time.Since(*u.Birthday).Hours()/24/365 >= 18
 	}
 	return false
+}
+
+func (u *User) ActivateHabit(id uuid.UUID) (*User, error) {
+	for _, habitId := range u.ActiveHabitIds {
+		if habitId == id {
+			return nil, ErrHabitAlreadyActivated
+		}
+	}
+
+	h := append(u.ActiveHabitIds, id)
+	u.ActiveHabitIds = h
+	u.AddEvent(NewHabitActivatedEvent(
+		uuid.NewString(),
+		time.Now().UTC(),
+		u.Id,
+		id,
+	))
+
+	return u, nil
 }

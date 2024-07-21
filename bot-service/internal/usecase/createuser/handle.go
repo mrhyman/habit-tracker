@@ -1,13 +1,15 @@
 package createuser
 
 import (
+	"context"
 	"errors"
+	"main/pkg"
 
 	"main/internal/domain"
 )
 
-func (ch CommandHandler) Handle(cmd Command) error {
-	user, err := ch.userRepo.GetUserByID(cmd.UserId)
+func (ch CommandHandler) Handle(ctx context.Context, cmd Command) error {
+	user, err := ch.userRepo.GetUserByID(ctx, cmd.UserId)
 	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return err
 	}
@@ -16,16 +18,17 @@ func (ch CommandHandler) Handle(cmd Command) error {
 	}
 
 	user, err = domain.NewUser(
+		pkg.RealUUIDGenerator{},
 		cmd.UserId,
 		cmd.UserNickname,
 		cmd.UserCreatedAt,
 		cmd.UserBirthday,
-		cmd.UserActiveHabitId,
+		cmd.UserActiveHabitIds,
 	)
 	if err != nil {
 		return err
 	}
-	if err = ch.userRepo.CreateUser(user); err != nil {
+	if err = ch.userRepo.CreateUser(ctx, user); err != nil {
 		return err
 	}
 
@@ -33,5 +36,5 @@ func (ch CommandHandler) Handle(cmd Command) error {
 		adultUserInc.Inc()
 	}
 
-	return nil
+	return ch.eventRouter.RouteAllEvents(ctx, user.PopAllEvents())
 }

@@ -3,11 +3,24 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"main/internal/domain"
 	"main/internal/usecase/createuser"
-	"net/http"
 )
 
+// CreateUserHandler godoc
+//
+//	@Summary	Create bot user
+//	@Tags		handler
+//	@Accept		json
+//	@Produce	json
+//	@Param		user	body	UserModel	true	"CreateUserRequest"
+//	@Router		/user/create [post]
+//	@Success	201
+//	@Failure	400	{string}	Bad		Request
+//	@Failure	409	{string}	Create	Conflict
+//	@Failure	500	{string}	Server	Error
 func (h *HttpHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var u UserModel
@@ -18,13 +31,13 @@ func (h *HttpHandler) CreateUser() http.Handler {
 			return
 		}
 
-		cmd, err := createuser.NewCommand(u.Id, u.Nickname, u.Birthday, u.ActiveHabitId)
+		cmd, err := createuser.NewCommand(u.Id, u.Nickname, u.Birthday, u.ActiveHabitIds)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		err = h.CreateUserHandler.Handle(cmd)
+		err = h.CreateUserHandler.Handle(r.Context(), cmd)
 		if err != nil {
 			if errors.Is(err, domain.ErrUserAlreadyExists) {
 				http.Error(w, err.Error(), http.StatusConflict)

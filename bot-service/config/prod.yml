@@ -12,3 +12,39 @@ scrape_interval: 2s
 logger:
   add_source: false
   level: 0 #info
+eventbus:
+  host:
+    - localhost:6502
+user_created_event_producer_config:
+  topic: user_created
+  required_acks: -1
+  compression_codec: 1
+  retry:
+    max: 5
+    backoff: 30ms
+  request_timeout: 100ms
+  idempotent: true
+  return_successes: true
+  max_in_flight_requests_per_connection: 1
+user_updated_event_producer_config:
+  topic: user_updated
+  required_acks: -1
+  compression_codec: 1
+  retry:
+    max: 5
+    backoff: 30ms
+  request_timeout: 100ms
+  idempotent: true
+  return_successes: true
+  max_in_flight_requests_per_connection: 1
+habit_activated_event_producer_config:
+  topic: habit_activated
+  required_acks: -1
+  compression_codec: 1
+  retry:
+    max: 5
+    backoff: 30ms
+  request_timeout: 100ms
+  idempotent: true
+  return_successes: true
+  max_in_flight_requests_per_connection: 1

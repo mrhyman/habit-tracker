@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
                                       active_habit_id uuid
 );
 
-CREATE INDEX idx_users_active_habit_id ON users (id);
 ---- create above / drop below ----
 
 drop table users;

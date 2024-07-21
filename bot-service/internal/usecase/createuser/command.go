@@ -12,18 +12,18 @@ var (
 )
 
 type Command struct {
-	UserId            uuid.UUID
-	UserNickname      string
-	UserCreatedAt     time.Time
-	UserBirthday      *time.Time
-	UserActiveHabitId *uuid.UUID
+	UserId             uuid.UUID
+	UserNickname       string
+	UserCreatedAt      time.Time
+	UserBirthday       *time.Time
+	UserActiveHabitIds []uuid.UUID
 }
 
 func NewCommand(
 	id string,
 	nickname string,
 	birthday *time.Time,
-	activeHabitId *uuid.UUID,
+	activeHabitIds []uuid.UUID,
 ) (Command, error) {
 	if id == "" {
 		return Command{}, ErrInvalidUserID
@@ -39,9 +39,9 @@ func NewCommand(
 	}
 
 	return Command{
-		UserId:            uuidId,
-		UserNickname:      nickname,
-		UserBirthday:      birthday,
-		UserActiveHabitId: activeHabitId,
+		UserId:             uuidId,
+		UserNickname:       nickname,
+		UserBirthday:       birthday,
+		UserActiveHabitIds: activeHabitIds,
 	}, nil
 }

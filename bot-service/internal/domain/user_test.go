@@ -3,32 +3,20 @@ package domain
 import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"sync"
+	"main/pkg"
 	"testing"
 	"time"
 )
 
-var (
-	onceTimeNowFn sync.Once
-	testNowUtc    = time.Now().Truncate(time.Microsecond).UTC()
-)
-
-func setup() {
-	onceTimeNowFn.Do(func() {
-		timeNowFn = func() time.Time {
-			return testNowUtc
-		}
-	})
-}
-
-func TestCreateUser_success(t *testing.T) {
+func TestCreateUser(t *testing.T) {
 	t.Parallel()
 
 	var (
 		validUserId        = uuid.New()
-		validNickname      = "Some_userName"
+		validNickname      = uuid.NewString()
 		validBirthday      = testNowUtc.AddDate(-10, 0, 0)
 		validActiveHabitId = uuid.New()
+		uuidGenerator      = pkg.FakeUUIDGenerator{FixedUUID: uuid.NewString()}
 	)
 
 	type args struct {
@@ -58,6 +46,15 @@ func TestCreateUser_success(t *testing.T) {
 				CreatedAt:     testNowUtc,
 				Birthday:      &validBirthday,
 				ActiveHabitId: &validActiveHabitId,
+				AggregateRoot: AggregateRoot{Events: []Event{NewUserCreatedEvent(
+					uuidGenerator.NewString(),
+					testNowUtc,
+					validUserId,
+					validNickname,
+					testNowUtc,
+					&validBirthday,
+					&validActiveHabitId,
+				)}},
 			},
 			wantErr: "",
 		},
@@ -75,6 +72,15 @@ func TestCreateUser_success(t *testing.T) {
 				CreatedAt:     testNowUtc,
 				Birthday:      nil,
 				ActiveHabitId: nil,
+				AggregateRoot: AggregateRoot{Events: []Event{NewUserCreatedEvent(
+					uuidGenerator.NewString(),
+					testNowUtc,
+					validUserId,
+					validNickname,
+					testNowUtc,
+					nil,
+					nil,
+				)}},
 			},
 			wantErr: "",
 		},
@@ -117,7 +123,7 @@ func TestCreateUser_success(t *testing.T) {
 			t.Parallel()
 			setup()
 
-			got, err := NewUser(tt.args.Id, tt.args.Nickname, tt.args.CreatedAt, tt.args.Birthday, tt.args.ActiveHabitId)
+			got, err := NewUser(uuidGenerator, tt.args.Id, tt.args.Nickname, tt.args.CreatedAt, tt.args.Birthday, tt.args.ActiveHabitId)
 
 			if tt.wantErr == "" {
 				require.NoError(t, err)
